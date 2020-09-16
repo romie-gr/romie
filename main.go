@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +19,10 @@ import (
 )
 
 const numberOfGames = 790
+
+var games int
+var arrayCounter int
+var gbRom [numberOfGames]Rom // Φτιάξε μία array που θα χωράει numberOfGames elements τύπου Rom
 
 // Βρες τον αριθμό των σελίδων
 func getPageNumber(page string) int {
@@ -248,16 +254,17 @@ func fetchAllGames(consolePage string) int {
 }
 
 // Rom defines a typical game card
+// πρέπει να ξεκινάνε με κεφαλαίο, διαφορετικά το Marshal σε JSON δεν θα παίξει
 type Rom struct {
-	title        string
-	link         string
-	downloadLink string
-	filename     string
-	image        string
-	region       string
-	quality      string
-	hack         string
-	gameboy      string
+	Title        string `json:"title"`
+	Link         string `json:"link"`
+	DownloadLink string `json:"download_link"`
+	Filename     string `json:"filename"`
+	Image        string `json:"image"`
+	Region       string `json:"region"`
+	Quality      string `json:"quality"`
+	Hack         string `json:"hack"`
+	Gameboy      string `json:"gameboy"`
 }
 
 func loopGames(gbRom *[numberOfGames]Rom, page string) {
@@ -394,15 +401,15 @@ func loopGames(gbRom *[numberOfGames]Rom, page string) {
 					gameboy = "Classic"
 				}
 
-				gbRom[arrayCounter].title = title
-				gbRom[arrayCounter].link = link
-				gbRom[arrayCounter].downloadLink = downloadLink
-				gbRom[arrayCounter].filename = filename
-				gbRom[arrayCounter].image = image
-				gbRom[arrayCounter].region = region
-				gbRom[arrayCounter].quality = quality
-				gbRom[arrayCounter].hack = hack
-				gbRom[arrayCounter].gameboy = gameboy
+				gbRom[arrayCounter].Title = title
+				gbRom[arrayCounter].Link = link
+				gbRom[arrayCounter].DownloadLink = downloadLink
+				gbRom[arrayCounter].Filename = filename
+				gbRom[arrayCounter].Image = image
+				gbRom[arrayCounter].Region = region
+				gbRom[arrayCounter].Quality = quality
+				gbRom[arrayCounter].Hack = hack
+				gbRom[arrayCounter].Gameboy = gameboy
 
 				fmt.Printf("Link: %s\nDownload: %s\nFilename: %s\nImage: %s\nRegion: %s\nQuality: %s\nHack: %s\nConsole: %s\n\n", link, downloadLink, filename, image, region, quality, hack, gameboy)
 
@@ -417,32 +424,85 @@ func loopGames(gbRom *[numberOfGames]Rom, page string) {
 	})
 }
 
-var games int
-var arrayCounter int
+// FileExists reports whether the named file or directory exists.
+func FileExists(name string) bool {
+	if _, err := os.Stat(name); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
+}
 
 func main() {
-	gameBoyPage := "https://www.emulatorgames.net/roms/gameboy/"
-	games = fetchAllGames(gameBoyPage)
-	fmt.Printf("There are %d roms for gameboy\n\n", games)
+	// Βρες το homedir και σχηματισε το αρχείο
+	dbFileName := "db.json"
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("couldn't find the $HOME directory\nError: %s", err)
 
-	// If this number has been changed, open a pull-request
-	if games != numberOfGames {
-		err := fmt.Errorf("the actual number of games is %d but the program knows %d. Open a github issue with this information", games, numberOfGames)
-		log.Fatal(err)
 	}
+	dbFile := home + "/" + dbFileName
 
-	var gbRom [numberOfGames]Rom // Φτιάξε μία array που θα χωράει numberOfGames elements τύπου Rom
-
-	var link string
-	lastpage := getPageNumber(gameBoyPage)
-	for i := 1; i <= lastpage; i++ {
-		if i == 1 {
-			link = "https://www.emulatorgames.net/roms/gameboy/"
-		} else {
-			link = fmt.Sprintf("%s%d/", gameBoyPage, i)
+	// Αν υπάρχει το αρχείο, parsαρέ το
+	if FileExists(dbFile) {
+		fmt.Println("Parsing the file")
+		// Διάβασε το αρχείο
+		fileJSON, err := ioutil.ReadFile(dbFile)
+		if err != nil {
+			log.Fatalf("Δεν μπόρεσα να διαβάσω το αρχείο.\nError: %s\n", err)
 		}
-		loopGames(&gbRom, link) // Πάσαρε την array μέσω pointer έτσι ώστε οι αλλαγές να περάσουν πίσω στη main
+		json.Unmarshal(fileJSON, &gbRom)
+		// Διαβασε και εκτυπωσε την array
+		// for k, v := range gbRom {
+		// 	fmt.Printf("The game %d is %s.\n", k, v)
+		// }
+	} else {
+		// Αν δεν υπάρχει, δημιούργησέ το
+
+		fmt.Printf("No local file found. Downloading database ... %s\n", dbFile)
+
+		// Ξεκίνα το HTML scraping
+		gameBoyPage := "https://www.emulatorgames.net/roms/gameboy/"
+		games = fetchAllGames(gameBoyPage)
+		fmt.Printf("There are %d roms for gameboy\n\n", games)
+
+		// If this number has been changed, open a pull-request
+		if games != numberOfGames {
+			err := fmt.Errorf("the actual number of games is %d but the program knows %d. Open a github issue with this information", games, numberOfGames)
+			log.Fatal(err)
+		}
+
+		var link string
+		lastpage := getPageNumber(gameBoyPage)
+		for i := 1; i <= lastpage; i++ {
+			if i == 1 {
+				link = "https://www.emulatorgames.net/roms/gameboy/"
+			} else {
+				link = fmt.Sprintf("%s%d/", gameBoyPage, i)
+			}
+			loopGames(&gbRom, link) // Πάσαρε την array μέσω pointer έτσι ώστε οι αλλαγές να περάσουν πίσω στη main
+		}
+
+		// Διαβασε και εκτυπωσε την array
+		// for k, v := range gbRom {
+		// 	fmt.Printf("The game %d is %s.\n", k, v)
+		// }
+
+		// Γραψε την structure σε ενα τοπικό αρχείο
+		fileJSON, err := json.Marshal(gbRom)
+		if err != nil {
+			log.Fatal("Couldn't encode to JSON")
+		}
+
+		//fmt.Fprintf(os.Stdout, "%s", fileJSON)
+
+		err = ioutil.WriteFile(dbFile, fileJSON, 0644)
+		if err != nil {
+			log.Fatalf("Couldn't update the db file %s\nError: %s", dbFile, err)
+		}
+
+		fmt.Println("Phew .... It's finished")
 	}
 
-	fmt.Println("Phew .... It's finished")
 }
