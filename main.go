@@ -267,6 +267,22 @@ type Rom struct {
 	Gameboy      string `json:"gameboy"`
 }
 
+func downloadRoms(gbRom *[numberOfGames]Rom) {
+	for k, v := range gbRom {
+		fmt.Printf("The game %d is %s.\n", k, v)
+
+		if v.Quality == "Verified" && v.Gameboy != "Bung Fix" && v.Gameboy != "Color" && v.Hack == "No" && (strings.Contains(v.Region, "USA") || strings.Contains(v.Region, "Europe")) {
+			// fetch rom
+			downloadFile(v.Filename, v.DownloadLink)
+
+			// fetch logo image
+			imgExtension := filepath.Ext(v.Image)
+			filenameImage := fmt.Sprintf("%s%s", v.Title, imgExtension)
+			downloadFile(filenameImage, v.Image)
+		}
+	}
+}
+
 func loopGames(gbRom *[numberOfGames]Rom, page string) {
 	// Request the HTML page.
 	res, err := http.Get(page)
@@ -313,7 +329,7 @@ func loopGames(gbRom *[numberOfGames]Rom, page string) {
 
 				image := FetchImageLink(link)
 				extension = filepath.Ext(image)
-				filenameImage := fmt.Sprintf("%s%s", title, extension)
+				// filenameImage := fmt.Sprintf("%s%s", title, extension)
 
 				if strings.Contains(downloadLink, "(E)") {
 					region = "Europe"
@@ -412,11 +428,6 @@ func loopGames(gbRom *[numberOfGames]Rom, page string) {
 				gbRom[arrayCounter].Gameboy = gameboy
 
 				fmt.Printf("Link: %s\nDownload: %s\nFilename: %s\nImage: %s\nRegion: %s\nQuality: %s\nHack: %s\nConsole: %s\n\n", link, downloadLink, filename, image, region, quality, hack, gameboy)
-
-				if quality == "Verified" && gameboy != "Bung Fix" && gameboy != "Color" && hack == "No" && (strings.Contains(region, "USA") || strings.Contains(region, "Europe")) {
-					downloadFile(filename, downloadLink)
-					downloadFile(filenameImage, image)
-				}
 
 				arrayCounter++
 			}
