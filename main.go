@@ -129,9 +129,6 @@ func ExampleScrape(page string) {
 
 				filename := fmt.Sprintf("%s.zip", title)
 				fmt.Printf("Link: %s\nDownload: %s\nFilename: %s\n\n", link, downloadLink, filename)
-
-				// Download
-				// downloadFile(filename, link)
 			}
 		})
 	})
@@ -170,9 +167,9 @@ func FetchImageLink(page string) string {
 func downloadFile(filepath string, url string) (err error) {
 	// TODO αισχρό checking
 	if strings.Contains(filepath, "jpg") {
-		fmt.Printf("Downloading image...\n")
+		fmt.Printf("Debug: Downloading image...\n")
 	} else {
-		fmt.Printf("Downloading rom...\n")
+		fmt.Printf("Debug: Downloading rom...\n")
 	}
 
 	// Create the file
@@ -195,7 +192,6 @@ func downloadFile(filepath string, url string) (err error) {
 		return err
 	}
 
-	fmt.Printf("\n\n")
 	return nil
 }
 
@@ -268,10 +264,9 @@ type Rom struct {
 }
 
 func downloadRoms(gbRom *[numberOfGames]Rom) {
-	for k, v := range gbRom {
-		fmt.Printf("The game %d is %s.\n", k, v)
-
+	for _, v := range gbRom {
 		if v.Quality == "Verified" && v.Gameboy != "Bung Fix" && v.Gameboy != "Color" && v.Hack == "No" && (strings.Contains(v.Region, "USA") || strings.Contains(v.Region, "Europe")) {
+			fmt.Printf("%s\n", v.Title)
 			// fetch rom
 			downloadFile(v.Filename, v.DownloadLink)
 
@@ -464,10 +459,9 @@ func main() {
 			log.Fatalf("Δεν μπόρεσα να διαβάσω το αρχείο.\nError: %s\n", err)
 		}
 		json.Unmarshal(fileJSON, &gbRom)
-		// Διαβασε και εκτυπωσε την array
-		// for k, v := range gbRom {
-		// 	fmt.Printf("The game %d is %s.\n", k, v)
-		// }
+
+		// Κατέβασε τα παιχνίδια
+		downloadRoms(&gbRom)
 	} else {
 		// Αν δεν υπάρχει, δημιούργησέ το
 
