@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -165,12 +166,7 @@ func FetchImageLink(page string) string {
 }
 
 func downloadFile(filepath string, url string) (err error) {
-	// TODO αισχρό checking
-	if strings.Contains(filepath, "jpg") {
-		fmt.Printf("Debug: Downloading image...\n")
-	} else {
-		fmt.Printf("Debug: Downloading rom...\n")
-	}
+	defer cleanup()
 
 	// Create the file
 	out, err := os.Create(filepath)
@@ -186,7 +182,7 @@ func downloadFile(filepath string, url string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	// Writer the body to file
+	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
@@ -263,17 +259,42 @@ type Rom struct {
 	Gameboy      string `json:"gameboy"`
 }
 
+var wg sync.WaitGroup
+
+func cleanup() {
+	defer wg.Done()
+	if r := recover(); r != nil {
+		fmt.Println("Recovered in cleanup", r)
+	}
+}
+
 func downloadRoms(gbRom *[numberOfGames]Rom) {
 	for _, v := range gbRom {
 		if v.Quality == "Verified" && v.Gameboy != "Bung Fix" && v.Gameboy != "Color" && v.Hack == "No" && (strings.Contains(v.Region, "USA") || strings.Contains(v.Region, "Europe")) {
 			fmt.Printf("%s\n", v.Title)
 			// fetch rom
-			downloadFile(v.Filename, v.DownloadLink)
+			wg.Add(1)
+			go downloadFile(v.Filename, v.DownloadLink)
 
 			// fetch logo image
 			imgExtension := filepath.Ext(v.Image)
 			filenameImage := fmt.Sprintf("%s%s", v.Title, imgExtension)
-			downloadFile(filenameImage, v.Image)
+			wg.Add(1)
+			go downloadFile(filenameImage, v.Image)
+		}
+	}
+	wg.Wait()
+}
+
+func searchGame(gbRom *[numberOfGames]Rom, game string) {
+	fmt.Printf("Searching %s ... \n\n", game)
+	for _, v := range gbRom {
+		if strings.Contains(v.Title, game) {
+			println("Title: " + v.Title)
+			println("Gameboy: " + v.Gameboy)
+			println("Region: " + v.Region)
+			println("Quality: " + v.Quality)
+			fmt.Printf("Cheats: %s\n\n", v.Hack)
 		}
 	}
 }
@@ -461,6 +482,7 @@ func main() {
 		json.Unmarshal(fileJSON, &gbRom)
 
 		// Κατέβασε τα παιχνίδια
+		// searchGame(&gbRom, "Luke")
 		downloadRoms(&gbRom)
 	} else {
 		// Αν δεν υπάρχει, δημιούργησέ το
