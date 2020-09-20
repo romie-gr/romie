@@ -23,9 +23,9 @@ const numberOfGames = 790
 
 var games int
 var arrayCounter int
-var gbRom [numberOfGames]Rom // Φτιάξε μία array που θα χωράει numberOfGames elements τύπου Rom
+var gbRom [numberOfGames]Rom // Build an array that will have numberOfGames elements from type Rom
 
-// Βρες τον αριθμό των σελίδων
+// Find the number of pages
 func getPageNumber(page string) int {
 	lastPage := 0
 
@@ -246,7 +246,7 @@ func fetchAllGames(consolePage string) int {
 }
 
 // Rom defines a typical game card
-// πρέπει να ξεκινάνε με κεφαλαίο, διαφορετικά το Marshal σε JSON δεν θα παίξει
+// has to start with capital letter or the Marshal won't work in JSON
 type Rom struct {
 	Title        string `json:"title"`
 	Link         string `json:"link"`
@@ -339,7 +339,7 @@ func loopGames(gbRom *[numberOfGames]Rom, page string) {
 					}
 				}
 
-				// TODO: Να μην υποθέτω ότι είναι πάντα zip
+				// TODO: Do not assume it's always a zip file extension
 				extension := filepath.Ext(downloadLink)
 				filename := fmt.Sprintf("%s%s", title, extension)
 
@@ -462,7 +462,7 @@ func FileExists(name string) bool {
 }
 
 func main() {
-	// Βρες το homedir και σχηματισε το αρχείο
+	// Find the homedir and create the file
 	dbFileName := "db.json"
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -471,25 +471,25 @@ func main() {
 	}
 	dbFile := home + "/" + dbFileName
 
-	// Αν υπάρχει το αρχείο, parsαρέ το
+	// If the file exists parse it
 	if FileExists(dbFile) {
 		fmt.Println("Parsing the file")
-		// Διάβασε το αρχείο
+		// Read the file
 		fileJSON, err := ioutil.ReadFile(dbFile)
 		if err != nil {
-			log.Fatalf("Δεν μπόρεσα να διαβάσω το αρχείο.\nError: %s\n", err)
+			log.Fatalf("Could not read the file.\nError: %s\n", err)
 		}
 		json.Unmarshal(fileJSON, &gbRom)
 
-		// Κατέβασε τα παιχνίδια
+		// Download the games
 		// searchGame(&gbRom, "Luke")
 		downloadRoms(&gbRom)
 	} else {
-		// Αν δεν υπάρχει, δημιούργησέ το
+		// If it doesn't exist create it
 
 		fmt.Printf("No local file found. Downloading database ... %s\n", dbFile)
 
-		// Ξεκίνα το HTML scraping
+		// Start the HTML scraping
 		gameBoyPage := "https://www.emulatorgames.net/roms/gameboy/"
 		games = fetchAllGames(gameBoyPage)
 		fmt.Printf("There are %d roms for gameboy\n\n", games)
@@ -508,15 +508,15 @@ func main() {
 			} else {
 				link = fmt.Sprintf("%s%d/", gameBoyPage, i)
 			}
-			loopGames(&gbRom, link) // Πάσαρε την array μέσω pointer έτσι ώστε οι αλλαγές να περάσουν πίσω στη main
+			loopGames(&gbRom, link) // Pass the array through pointers so the changes pass back to main
 		}
 
-		// Διαβασε και εκτυπωσε την array
+		// Read and print the array
 		// for k, v := range gbRom {
 		// 	fmt.Printf("The game %d is %s.\n", k, v)
 		// }
 
-		// Γραψε την structure σε ενα τοπικό αρχείο
+		// Write the structure in a local file
 		fileJSON, err := json.Marshal(gbRom)
 		if err != nil {
 			log.Fatal("Couldn't encode to JSON")
