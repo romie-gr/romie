@@ -1,8 +1,8 @@
-## skills:
+## skills
 
-- Experience with Github projects
+  - Experience with Github projects
 
-## badges:
+## badges
 
-- [git-1](../git-1)
-    - granted-by: [drpaneas](https://github.com/drpaneas)
+  - [git-1](../git-1)
+  - granted-by: [drpaneas](https://github.com/drpaneas)
