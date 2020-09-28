@@ -6,7 +6,7 @@ jobs:
   add-assignees:
     runs-on: ubuntu-latest
     steps:
-      - name: Test toshimaru/auto-author-assign action
+      - name: auto-author-assign
         uses: toshimaru/auto-author-assign@v1.1.2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
