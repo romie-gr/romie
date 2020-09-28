@@ -1,0 +1,12 @@
+name: 'Auto Author Assign'
+on:
+  pull_request:
+    types: [opened, reopened]
+jobs:
+  add-assignees:
+    runs-on: ubuntu-latest
+    steps:
+      - name: auto-author-assign
+        uses: toshimaru/auto-author-assign@v1.1.2
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
