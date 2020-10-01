@@ -1,0 +1,16 @@
+# This file contains all available configuration options
+# with their default values.
+
+# options for analysis running
+run:
+  tests: true
+
+linters:
+  enable-all: true
+  disable:
+    - gomnd
+    - gocognit
+    - goerr113
+    - gofumpt
+    - gci
+    - nlreturn
