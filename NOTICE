@@ -1,0 +1,25 @@
+#The NOTICE file currently is not particularly useful but it
+#should be used to identify (when needed) the following information
+#- The copyright holders of external code (eg. libraries)
+#- The portions of the source code for which they hold the copyright (if integrated whithin the code)
+#- The License adopted for that portion of the code
+#The above comments should be removed by a future commit
+
+Romie
+Copyright 2020 Romie Authors
+
+# The following notices are examples
+
+This product includes software developed at
+SOME NAME (http://link/).
+
+The Initial Developer of the examples/somefolder/some_subfolder,
+is SOME NAME (http://link/).
+Copyright 2009 - 2013 SOME NAME. All Rights Reserved.
+
+The ping sound effect (ping.mp3) in
+somefolder/some_subfolder
+was created by SOMEONE. (http://link/) under the terms of MIT License
+
+This product bundles SomeWidget of version 1.2.3, which is available under a
+"3-clause BSD" license. For details, see depends/superwidget/.
