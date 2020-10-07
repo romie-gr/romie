@@ -1,12 +1,17 @@
 name: 'Auto Author Assign'
+# See: https://github.community/t/resource-not-accessible-by-integration-assigning-author/136391
+
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
+
 jobs:
-  add-assignees:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: auto-author-assign
-        uses: toshimaru/auto-author-assign@v1.1.2
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+      - uses: toshimaru/auto-author-assign@v1.1.2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
