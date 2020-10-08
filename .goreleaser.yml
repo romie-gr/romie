@@ -2,12 +2,6 @@
 builds:
   - env:
       - CGO_ENABLED=0
-  # You can have multiple builds defined as a yaml list
-  - main: main.go
-    id: "romie"
-    dir: .
-    binary: romie
-
     goos:
       - linux
       - darwin
