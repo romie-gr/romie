@@ -1,3 +1,9 @@
-module github.com/drpaneas/romie
+module romie
 
 go 1.15
+
+require (
+	github.com/client9/misspell v0.3.4
+	github.com/golangci/golangci-lint v1.31.0
+	golang.org/x/tools v0.0.0-20201001230009-b5b87423c93b // indirect
+)
