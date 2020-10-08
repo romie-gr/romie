@@ -1,10 +1,11 @@
 # .goreleaser.yml proposed options for Romie
 builds:
   # You can have multiple builds defined as a yaml list
-  - main: /main.go
+  - main: main.go
     id: "romie"
-    dir: go
-    binary: main
+    dir: .
+    binary: romie
+
     goos:
       - linux
       - darwin
