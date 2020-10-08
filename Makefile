@@ -9,27 +9,27 @@ export GO111MODULE := on
 export GOPROXY = https://proxy.golang.org,direct
 
 # go source files
-SRC = $(shell find . -type f -name '*.go')
+SRC = $(shell find . -type f -name "*.go")
 # The name of the executable (default is current directory name)
 TARGET := $(shell echo $${PWD-`pwd`})
 
-.PHONY: all build setup fmt test cover lint ci clean todo run help
+.PHONY: all build setup fmt test cover lint clean todo run help
 
 ## all: Default target, now is build
 all: build
 
-## build: Builds the binary 
-build:
+## build: Builds the binary
+build: fmt
 	@echo "Building..."
 	@$(GOCMD) build -o ${NAME}
 
 ## setup: Runs mod download and generate
 setup:
 	@echo "Downloading tools and dependencies..."
-	@$(GOCMD) mod download
+	@$(GOCMD) mod download -x
 	@$(GOCMD) generate -v ./...
 
-## fmt: Runs go goimports and go fmt
+## fmt: Runs go goimports and gofmt
 fmt: setup
 	@echo "Checking the imports..."
 	@$(GOCMD)imports -w ${SRC}
@@ -45,17 +45,14 @@ test:
 cover: test
 	@$(GOCMD) tool cover -html=coverage.txt
 
-## lint: Runs golangci-lint (configuration at .golangci.yml) and misspell 
+## lint: Runs golangci-lint (configuration at .golangci.yml) and misspell
 lint: setup
 	@echo "Running linters..."
 	@golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 ./...
 	@misspell ./...
 
-## ci: Runs steup build, test, fmt, lint
-ci: setup build test fmt lint 
-
 ## clean: Runs go clean
-clean: 
+clean:
 	@echo "Cleaning..."
 	@$(GOCMD) clean
 
