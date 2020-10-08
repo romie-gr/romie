@@ -11,7 +11,7 @@ export GOPROXY = https://proxy.golang.org,direct
 # go source files
 SRC = $(shell find . -type f -name '*.go')
 # The name of the executable (default is current directory name)
-TARGET := $(shell echo $${PWD\#\#*/})
+TARGET := $(shell echo $${PWD-`pwd`})
 
 .PHONY: all build setup fmt test cover lint ci clean todo run help
 
