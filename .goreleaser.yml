@@ -1,5 +1,7 @@
 # .goreleaser.yml proposed options for Romie
 builds:
+  - env:
+      - CGO_ENABLED=0
   # You can have multiple builds defined as a yaml list
   - main: main.go
     id: "romie"
@@ -18,70 +20,4 @@ builds:
       - arm
       - arm64
     ldflags:
-     - -s -w -X main.build={{.Version}}
-
-# OPTIONS NOT YET IMPLEMENTED TO ROMIE
-#    # Custom flags templates.
-#    # Default is empty.
-#    flags:
-#      - -tags=dev
-#      - -v
-#
-#    # Custom asmflags templates.
-#    # Default is empty.
-#    asmflags:
-#      - -D mysymbol
-#      - all=-trimpath={{.Env.GOPATH}}
-#
-#    # Custom gcflags templates.
-#    # Default is empty.
-#    gcflags:
-#      - all=-trimpath={{.Env.GOPATH}}
-#      - ./dontoptimizeme=-N
-#
-#    # Custom environment variables to be set during the builds.
-#    # Default is empty.
-#    env:
-#      - CGO_ENABLED=0
-#
-#    # GOMIPS and GOMIPS64 to build when GOARCH is mips, mips64, mipsle or mips64le.
-#    # For more info refer to: https://golang.org/doc/install/source#environment
-#    # Default is empty.
-#   gomips:
-#      - hardfloat
-#      - softfloat
-#
-#    # List of combinations of GOOS + GOARCH + GOARM to ignore.
-#    # Default is empty.
-#    ignore:
-#      - goos: darwin
-#        goarch: 386
-#      - goos: linux
-#        goarch: arm
-#        goarm: 7
-#      - goarm: mips64
-#        gomips: hardfloat
-#
-#    # Set a specific go binary to use when building. It is safe to ignore
-#    # this option in most cases.
-#    # Default is "go"
-#    gobinary: "go1.13.4"
-#
-#    # Set the modified timestamp on the output binary, typically
-#    # you would do this to ensure a build was reproducible. Pass
-#    # empty string to skip modifying the output.
-#    # Default is empty string.
-#    mod_timestamp: '{{ .CommitTimestamp }}'
-#
-#    # Hooks can be used to customize the final binary,
-#    # for example, to run generators.
-#    # Those fields allow templates.
-#    # Default is both hooks empty.
-#    hooks:
-#      pre: rice embed-go
-#      post: ./script.sh {{ .Path }}
-#
-#    # If true, skip the build.
-#    # Useful for library projects.
-#    # Default is false
-#    skip: false
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
