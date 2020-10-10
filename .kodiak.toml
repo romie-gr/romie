@@ -1,0 +1,21 @@
+version = 1
+
+[merge]
+# Attempt to merge any PR that passes all GitHub branch protection requirements
+require_automerge_label = false
+# Do not merge a PR with any of these labels
+blocking_labels = ["wip", "Do not merge"]
+# COnfigure merge PR method be be squash & merge
+method = "squash"
+
+[merge.message]
+# Use PR title for the merge commit
+title = "pull_request_title"
+# Use PR body for the merge commit
+body = "pull_request_body"
+# Remove html comments to auto remove PR templates
+strip_html_comments = true
+
+[approve]
+# Automatically approve Dependabot pull requests
+auto_approve_usernames = ["dependabot"]
