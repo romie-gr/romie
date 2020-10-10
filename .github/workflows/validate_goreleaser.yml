@@ -29,5 +29,5 @@ jobs:
 
       - name: Check goreleaser validity
         run: |
-          goreleaser check
+          ./bin/goreleaser check
 
