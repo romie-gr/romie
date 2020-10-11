@@ -8,10 +8,27 @@ builds:
       - windows
       - freebsd
       - openbsd
+      - netbsd
+      - dragonfly
     goarch:
       - 386
       - amd64
       - arm
       - arm64
+    ignore:
+      - goos: darwin
+        goarch: 386, arm
+      - goos: windows
+        goarch: arm, arm64
+      - goos: freebsd
+        goarch: arm64
+      - goos: netbsd
+        goarch: arm64
+      - goos: dragonfly
+        goarch: 386, arm, arm64
+    goarm:
+      - 6
+      - 7
+    mod_timestamp: "{{ .CommitTimestamp }}"
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
