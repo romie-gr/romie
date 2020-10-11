@@ -26,8 +26,11 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pattern: '^(go\.(mod|sum)|\.github\/workflows\/go-mod-tidy\.yml)$'
 
+      - name: Debug
+        run: echo "${{ steps.changed_files.outputs.files_updated }}"
+
       - name: Run go-mod-tidy-pr
-        if: steps.git_diff.outputs.files_updated
+        if: steps.changed_files.outputs.files_updated
         uses: sue445/go-mod-tidy-pr@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
