@@ -1,0 +1,34 @@
+name: 'Automate go mod tidy'
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  go-mod-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.3
+        with:
+          fetch-depth: 0
+
+      - name: Changed Files Exporter
+        uses: futuratrepadeira/changed-files@v3.2.1
+        id: changed_files
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: '^(go\.(mod|sum)|\.github\/workflows\/go-mod-tidy\.yml)$'
+
+      - name: Run go-mod-tidy-pr
+        if: steps.git_diff.outputs.files_updated
+        uses: sue445/go-mod-tidy-pr@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_user_name: Dependabot
+          git_user_email: github-actions@example.com
+          labels: automerge
+
