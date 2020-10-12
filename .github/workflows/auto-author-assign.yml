@@ -12,6 +12,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
-      - uses: toshimaru/auto-author-assign@v1.1.2
+      - uses: toshimaru/auto-author-assign@v1.2.0
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
