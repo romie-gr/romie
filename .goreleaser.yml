@@ -1,6 +1,7 @@
 # .goreleaser.yml proposed options for Romie
 builds:
-  - env:
+  - id: romie
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -50,3 +51,105 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
 
+nfpms:
+  - id: "default"
+
+    package_name: romie
+
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+    builds:
+      - romie
+
+    replacements:
+      amd64: 64-bit
+      386: 32-bit
+      darwin: macOS
+      arm: ARM
+      arm64: ARM64
+      linux: Linux
+      windows: Windows
+      openbsd: OpenBSD
+      netbsd: NetBSD
+      freebsd: FreeBSD
+      dragonfly: DragonFlyBSD
+
+    vendor: Romie Team.
+
+    homepage: https://github.com/drpaneas/romie
+
+    maintainer: Bill <blee571575@live.com>
+
+    description: Software for crawling rom sites and searching for roms.
+
+    license: Apache 2.0
+
+    formats:
+      - apk
+      - deb
+      - rpm
+
+    dependencies:
+      - git
+
+    recommends:
+
+    suggests:
+
+    conflicts:
+
+    # Default: /usr/local/bin
+    bindir: /usr/bin
+
+    epoch: 1
+
+    release: 1
+
+    # Makes a meta package - an empty package that contains only supporting files and dependencies.
+    # When set to `true`, the `builds` option is ignored.
+    # Default: false.
+    meta: false
+
+    # Empty folders that should be created and managed by the packager
+    # implementation.
+    # Default is empty.
+    empty_folders:
+
+    # Files to add to your package (beyond the binary).
+    # Keys are source paths/globs to get the files from.
+    # Values are the destination locations of the files in the package.
+    # Use globs to add all contents of a folder.
+    files:
+
+    # Config files to add to your package. They are about the same as
+    # the files keyword, except package managers treat them differently (while
+    # uninstalling, mostly).
+    # Keys are source paths/globs to get the files from.
+    # Values are the destination locations of the files in the package.
+    config_files:
+
+    # Scripts to execute during the installation of the package.
+    # Keys are the possible targets during the installation process
+    # Values are the paths to the scripts which will be executed
+    # example:
+    # preinstall: "scripts/preinstall.sh"
+    # postinstall: "scripts/postinstall.sh"
+    # preremove: "scripts/preremove.sh"
+    # postremove: "scripts/postremove.sh"
+    scripts:
+
+    # Some attributes can be overrided per package format.
+    overrides:
+      deb:
+        conflicts:
+        dependencies:
+        suggests:
+        recommends:
+        empty_folders:
+      rpm:
+        replacements:
+          amd64: x86_64
+        file_name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Arch }}"
+        files:
+        config_files:
+        scripts:
