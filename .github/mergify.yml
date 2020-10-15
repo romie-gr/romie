@@ -1,0 +1,32 @@
+pull_request_rules:
+  - name: Automatic merge for master when reviewed and CI passes
+    conditions:
+      - check-success=validate_goreleaser
+      - "#approved-reviews-by>=2"
+      - "#changes-requested-reviews-by=0"
+      - base=master
+      - label!=Do not merge
+    actions:
+      merge:
+        method: squash
+        strict: smart+fasttrack
+        priority: medium
+
+  - name: Automatic merge for Dependabot pull requests (low priority)
+    conditions:
+      - author~=^dependabot\[bot\]$
+      - check-success=validate_goreleaser
+      - label!=Do not merge
+    actions:
+      review:
+        type: APPROVE
+      merge:
+        method: squash
+        strict: false
+        priority: low
+
+  - name: Remove outdated reviews
+    conditions:
+      - base=master
+    actions:
+      dismiss_reviews: {}
