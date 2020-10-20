@@ -64,6 +64,10 @@ todo:
 run: build
 	@$(GOCMD) run ${TARGET}
 
+## serve: Serves the documentation locally using Docker
+serve:
+	@docker run --rm -it -p 8000:8000 -v ${PWD}/www:/docs squidfunk/mkdocs-material
+
 ## help: Prints this help message
 help:
 	@echo "Usage:"
