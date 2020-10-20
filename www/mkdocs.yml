@@ -1,0 +1,13 @@
+site_name: Romie
+site_description: 'Documentation for Romie'
+site_url: https://romie.com
+repo_url: https://github.com/drpaneas/romie
+theme:
+  name: material
+markdown_extensions:
+    - toc:
+        permalink: True
+        separator: "_"
+nav:
+  - Home: index.md
+  - Contributing: contributing.md
