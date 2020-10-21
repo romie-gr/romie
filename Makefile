@@ -13,7 +13,7 @@ SRC = $(shell find . -type f -name "*.go")
 # The name of the executable (default is current directory name)
 TARGET := $(shell echo $${PWD-`pwd`})
 
-.PHONY: all build setup fmt test cover lint clean todo run help
+.PHONY: all build setup fmt test cover lint clean todo run serve help
 
 ## all: Default target, now is build
 all: build
