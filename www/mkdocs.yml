@@ -1,6 +1,6 @@
 site_name: Romie
 site_description: 'Documentation for Romie'
-site_url: https://romie.com
+site_url: https://drpaneas.github.io/romie/
 repo_url: https://github.com/drpaneas/romie
 theme:
   name: material
