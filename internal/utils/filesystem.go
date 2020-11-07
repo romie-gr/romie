@@ -1,10 +1,21 @@
 package utils
 
 import (
-	"os"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 )
+
+var (
+	AppFs     afero.Fs
+	FSUtil *afero.Afero
+)
+
+func init() {
+	AppFs = afero.NewOsFs()
+	FSUtil = &afero.Afero{Fs: AppFs}
+}
 
 // FolderExists reports whether the provided directory exists.
 func FolderExists(path string) bool {
@@ -13,13 +24,11 @@ func FolderExists(path string) bool {
 		return false
 	}
 
-	info, err := os.Stat(path)
+	exists, err := FSUtil.DirExists(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			log.Debug("Path does not exist")
-			return false
-		}
+		log.Debug(fmt.Printf("Error: %s", err.Error()))
+		return false
 	}
 
-	return info.IsDir()
+	return exists
 }

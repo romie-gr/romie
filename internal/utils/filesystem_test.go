@@ -3,7 +3,17 @@ package utils
 import (
 	"fmt"
 	"testing"
+
+	"github.com/spf13/afero"
 )
+
+func init() {
+	AppFs = afero.NewMemMapFs()
+	FSUtil = &afero.Afero{Fs: AppFs}
+
+	_ = FSUtil.Mkdir("/a-folder-that-exists", 0755)
+	_, _ = FSUtil.Create("/a-folder-that-exists/file.txt")
+}
 
 func ExampleFolderExists() {
 	exists := FolderExists("/a-non-existing-folder")
@@ -23,17 +33,17 @@ func TestFolderExists(t *testing.T) {
 	}{
 		{
 			"Returns true when given folder exists",
-			"./testdata/a-folder-that-exists",
+			"/a-folder-that-exists",
 			true,
 		},
 		{
 			"Returns false when given folder does not exist",
-			"./testdata/a-folder-that-does-not-exist",
+			"/a-folder-that-does-not-exist",
 			false,
 		},
 		{
 			"Returns false when provided path is not a directory",
-			"./testdata/file.txt",
+			"/a-folder-that-exists/file.txt",
 			false,
 		},
 		{
