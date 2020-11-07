@@ -43,6 +43,7 @@ func TestFolderExists(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := FolderExists(tt.path); got != tt.want {
 				t.Errorf("FolderExists() = %v, want %v", got, tt.want)
