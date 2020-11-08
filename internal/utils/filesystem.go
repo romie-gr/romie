@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-var AppFs = &afero.Afero{Fs: afero.NewOsFs()}
+var appFs = &afero.Afero{Fs: afero.NewOsFs()}
 
 // FolderExists reports whether the provided directory exists.
 func FolderExists(path string) bool {
@@ -16,7 +16,7 @@ func FolderExists(path string) bool {
 		return false
 	}
 
-	exists, err := AppFs.DirExists(path)
+	exists, err := appFs.DirExists(path)
 	if err != nil {
 		log.Debug(fmt.Printf("Error: %s", err.Error()))
 		return false

@@ -1,15 +1,14 @@
-package utils_test
+package utils
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/romie-gr/romie/internal/utils"
 	"github.com/spf13/afero"
 )
 
 func ExampleFolderExists() {
-	exists := utils.FolderExists("/a-non-existing-folder")
+	exists := FolderExists("/a-non-existing-folder")
 	if exists {
 		fmt.Println("Folder exists")
 	} else {
@@ -19,10 +18,10 @@ func ExampleFolderExists() {
 }
 
 func TestFolderExists(t *testing.T) {
-	utils.AppFs = &afero.Afero{Fs: afero.NewMemMapFs()}
+	appFs = &afero.Afero{Fs: afero.NewMemMapFs()}
 
-	_ = utils.AppFs.Mkdir("/a-folder-that-exists", 0755)
-	_, _ = utils.AppFs.Create("/a-folder-that-exists/file.txt")
+	_ = appFs.Mkdir("/a-folder-that-exists", 0755)
+	_, _ = appFs.Create("/a-folder-that-exists/file.txt")
 
 	tests := []struct {
 		name string
@@ -53,7 +52,7 @@ func TestFolderExists(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			if got := utils.FolderExists(tt.path); got != tt.want {
+			if got := FolderExists(tt.path); got != tt.want {
 				t.Errorf("FolderExists() = %v, want %v", got, tt.want)
 			}
 		})
