@@ -14,3 +14,5 @@ linters:
     - gofumpt
     - gci
     - nlreturn
+    - testpackage
+    - gochecknoglobals

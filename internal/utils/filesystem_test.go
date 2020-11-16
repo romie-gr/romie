@@ -18,10 +18,10 @@ func ExampleFolderExists() {
 }
 
 func TestFolderExists(t *testing.T) {
-	appFs = &afero.Afero{Fs: afero.NewMemMapFs()}
+	AppFS = &afero.Afero{Fs: afero.NewMemMapFs()}
 
-	_ = appFs.Mkdir("/a-folder-that-exists", 0755)
-	_, _ = appFs.Create("/a-folder-that-exists/file.txt")
+	_ = AppFS.Mkdir("/a-folder-that-exists", 0755)
+	_, _ = AppFS.Create("/a-folder-that-exists/file.txt")
 
 	tests := []struct {
 		name string

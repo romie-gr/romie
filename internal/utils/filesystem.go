@@ -4,10 +4,7 @@ import (
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
 )
-
-var appFs = &afero.Afero{Fs: afero.NewOsFs()}
 
 // FolderExists reports whether the provided directory exists.
 func FolderExists(path string) bool {
@@ -16,7 +13,7 @@ func FolderExists(path string) bool {
 		return false
 	}
 
-	exists, err := appFs.DirExists(path)
+	exists, err := AppFS.DirExists(path)
 	if err != nil {
 		log.Debug(fmt.Printf("Error: %s", err.Error()))
 		return false
