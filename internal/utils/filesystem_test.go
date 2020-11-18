@@ -7,6 +7,12 @@ import (
 	"github.com/spf13/afero"
 )
 
+var (
+	existingFolder    = "/a-folder-that-exists"
+	nonExistingFolder = "/a-folder-that-does-not-exist"
+	existingFile      = "/a-folder-that-exists/file.txt"
+)
+
 func ExampleFolderExists() {
 	exists := FolderExists("/a-non-existing-folder")
 	if exists {
@@ -20,8 +26,8 @@ func ExampleFolderExists() {
 func TestFolderExists(t *testing.T) {
 	AppFS = &afero.Afero{Fs: afero.NewMemMapFs()}
 
-	_ = AppFS.Mkdir("/a-folder-that-exists", 0755)
-	_, _ = AppFS.Create("/a-folder-that-exists/file.txt")
+	_ = AppFS.Mkdir(existingFolder, 0755)
+	_, _ = AppFS.Create(existingFile)
 
 	tests := []struct {
 		name string
@@ -30,17 +36,17 @@ func TestFolderExists(t *testing.T) {
 	}{
 		{
 			"Returns true when given folder exists",
-			"/a-folder-that-exists",
+			existingFolder,
 			true,
 		},
 		{
 			"Returns false when given folder does not exist",
-			"/a-folder-that-does-not-exist",
+			nonExistingFolder,
 			false,
 		},
 		{
 			"Returns false when provided path is not a directory",
-			"/a-folder-that-exists/file.txt",
+			existingFile,
 			false,
 		},
 		{
