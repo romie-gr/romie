@@ -12,9 +12,9 @@ jobs:
   Building:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-20.04, windows-latest, macos-latest]
-        fail-fast: false
     steps:
       - name: Checkout out source code
         uses: actions/checkout@v2.3.3
