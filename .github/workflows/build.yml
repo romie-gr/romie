@@ -20,6 +20,14 @@ jobs:
         with:
           fetch-depth: 0
           
+      - if: startsWith(matrix.os,'ubuntu')
+        name: Set up retroarch
+        run: |
+          sudo add-apt-repository -y ppa:libretro/stable && sudo apt-get update
+          sudo apt-get -y install retroarch*
+          retroarch --features
+          ls ~/.config/retroarch
+
       - name: Set up Go environment
         uses: actions/setup-go@v2.1.3
         with:
