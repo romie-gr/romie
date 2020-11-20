@@ -153,3 +153,8 @@ nfpms:
         files:
         config_files:
         scripts:
+
+checksum:
+  name_template: "{{ .ProjectName }}{{ .Version }}_checksums.txt"
+  algorithm: sha256
+  disable: false
