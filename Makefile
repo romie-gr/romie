@@ -13,7 +13,7 @@ SRC = $(shell find . -type f -name "*.go")
 # The name of the executable (default is current directory name)
 TARGET := $(shell echo $${PWD-`pwd`})
 
-.PHONY: all build setup fmt test cover lint clean todo run help
+.PHONY: all build setup fmt test cover lint clean todo run serve help
 
 ## all: Default target, now is build
 all: build
@@ -63,6 +63,10 @@ todo:
 ## run: Runs go run
 run: build
 	@$(GOCMD) run ${TARGET}
+
+## serve: Serves the documentation locally using Docker
+serve:
+	@docker run --rm -it -p 8000:8000 -v ${PWD}:/docs squidfunk/mkdocs-material
 
 ## help: Prints this help message
 help:
