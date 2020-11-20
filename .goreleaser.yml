@@ -155,6 +155,6 @@ nfpms:
         scripts:
 
 checksum:
-  name_template: "{{ .ProjectName }}_checksums.txt"
+  name_template: "{{ .ProjectName }}{{ .Version }}_checksums.txt"
   algorithm: sha256
   disable: false
