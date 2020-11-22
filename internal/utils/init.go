@@ -13,7 +13,7 @@ var AppFS = &afero.Afero{Fs: afero.NewOsFs()}
 func init() {
 	// Set debug mode on
 	if os.Getenv("ROMIE_DEBUG") == "on" {
-		// TODO: This is temporary. Remove it once Cobra/Viper is configured, to handle it as a boolean flags
+		// See https://github.com/romie-gr/romie/issues/154
 		log.SetLevel(log.DebugLevel)
 	}
 }
