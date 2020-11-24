@@ -21,3 +21,24 @@ func FolderExists(path string) bool {
 
 	return exists
 }
+
+// FileExists reports whether the provided file exists.
+func FileExists(path string) bool {
+	if path == "" {
+		log.Debug("Path is empty")
+		return false
+	}
+
+	exists, err := AppFS.Exists(path)
+	if err != nil {
+		log.Debug(fmt.Printf("Error: %s", err.Error()))
+		return false
+	}
+
+	if exists {
+		isDir, _ := AppFS.IsDir(path)
+		return !isDir
+	}
+
+	return false
+}
