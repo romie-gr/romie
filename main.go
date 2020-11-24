@@ -19,6 +19,32 @@ limitations under the License.
 
 package main
 
+import (
+	"fmt"
+
+	"github.com/romie-gr/romie/internal/debug"
+)
+
 func main() {
 	println("Hello romie")
+
+	myArray2 := []int{2, 4, 5, 6, 7, 8}
+	myArrayf := []string{"kolos"}
+
+	//debug.PrintArray(myArray2)
+	// debug.ArrayAllTypes(debug.Print, myArrayf)
+	// debug.ArrayAllTypes(debug.Print, myArray2)
+	debug.PrintArrayReflect(myArray2)
+	debug.PrintArrayReflect(myArrayf)
+
+	fmt.Println(debug.GetTypeArray(myArray2))
+	fmt.Println(debug.GetTypeArray(myArrayf))
+}
+
+func Summary(nums ...int) int {
+	res := 0
+	for _, n := range nums {
+		res += n
+	}
+	return res
 }
