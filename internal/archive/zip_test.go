@@ -86,6 +86,7 @@ func TestUnzip(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if err := Unzip(tt.filepath); (err != nil) != tt.wantErr {
 				t.Errorf("Unzip(%q) error = %v, wantErr %v", tt.filepath, err, tt.wantErr)
@@ -112,6 +113,7 @@ func Test_getFileNameWithoutExtension(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getFileNameWithoutExtension(tt.fileName); got != tt.want {
 				t.Errorf("getFileNameWithoutExtension(%q) = %v, want %v", tt.fileName, got, tt.want)

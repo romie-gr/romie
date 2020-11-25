@@ -16,3 +16,7 @@ linters:
     - nlreturn
     - testpackage
     - gochecknoglobals
+    - gochecknoinits
+    - godot
+    - exhaustivestruct
+    - wsl

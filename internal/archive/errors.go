@@ -27,12 +27,12 @@ func (e CreateDirectoryError) Error() string {
 }
 
 type OpenZipError struct {
-	Source string
-	Err    error
+	FilePath string
+	Err      error
 }
 
 func (e OpenZipError) Error() string {
-	return fmt.Sprintf("cannot open zip file: %s: %s", e.Source, e.Err)
+	return fmt.Sprintf("cannot open zip file: %s: %s", e.FilePath, e.Err)
 }
 
 type ExtractFileError struct {
@@ -45,19 +45,33 @@ func (e ExtractFileError) Error() string {
 }
 
 type OpenFileError struct {
-	SavedLocation string
-	Err           error
+	Location string
+	Write    bool
+	Err      error
 }
 
 func (e OpenFileError) Error() string {
-	return fmt.Sprintf("cannot open file for writing: %s: %s", e.SavedLocation, e.Err)
+	if e.Write {
+		return fmt.Sprintf("cannot open file for writing: %s: %s", e.Location, e.Err)
+	}
+
+	return fmt.Sprintf("cannot open file: %s: %s", e.Location, e.Err)
+}
+
+type StatFileError struct {
+	Location string
+	Err      error
+}
+
+func (e StatFileError) Error() string {
+	return fmt.Sprintf("cannot retrieve fileinfo for file: %s: %s", e.Location, e.Err)
 }
 
 type WriteFileError struct {
-	SavedLocation string
-	Err           error
+	Location string
+	Err      error
 }
 
 func (e WriteFileError) Error() string {
-	return fmt.Sprintf("cannot write to file: %s: %s", e.SavedLocation, e.Err)
+	return fmt.Sprintf("cannot write to file: %s: %s", e.Location, e.Err)
 }

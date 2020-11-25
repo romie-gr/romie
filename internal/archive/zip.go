@@ -46,13 +46,13 @@ func extract(source string, destination string) error {
 
 	file, err := utils.AppFS.Open(source)
 	if err != nil {
-		return err
+		return OpenFileError{source, false, err}
 	}
 	defer file.Close()
 
 	fileStat, err := file.Stat()
 	if err != nil {
-		return err
+		return StatFileError{source, err}
 	}
 
 	reader, err := zip.NewReader(file, fileStat.Size())
@@ -92,7 +92,7 @@ func unzipFile(destination string, file *zip.File) error {
 	mode := file.Mode()
 	newFile, err := utils.AppFS.OpenFile(savedLocation, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, mode)
 	if err != nil {
-		return OpenFileError{savedLocation, err}
+		return OpenFileError{savedLocation, true, err}
 	}
 	defer newFile.Close()
 
