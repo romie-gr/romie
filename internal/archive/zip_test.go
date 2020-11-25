@@ -93,3 +93,29 @@ func TestUnzip(t *testing.T) {
 		})
 	}
 }
+
+func Test_getFileNameWithoutExtension(t *testing.T) {
+	tests := []struct {
+		name     string
+		fileName string
+		want     string
+	}{
+		{
+			"It finds filename from a file in current path",
+			"romie-guide.mkv",
+			"romie-guide",
+		},
+		{
+			"It finds filename from full filepath",
+			"/user/john/home/.romie/config/managers.yaml",
+			"/user/john/home/.romie/config/managers",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getFileNameWithoutExtension(tt.fileName); got != tt.want {
+				t.Errorf("getFileNameWithoutExtension(%q) = %v, want %v", tt.fileName, got, tt.want)
+			}
+		})
+	}
+}
