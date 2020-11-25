@@ -17,7 +17,6 @@ import (
 // Unzip Decompresses an archive inside its containing directory
 func Unzip(filePath string) error {
 	// Check for file existence
-	utils.FileExists(filePath)
 	if !utils.FileExists(filePath) {
 		log.Error("Error trying to identify path")
 		return MissingFileError{filePath}
