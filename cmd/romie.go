@@ -35,7 +35,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.romie.yaml)")
-	rootCmd.PersistentFlags().BoolVar(&debugFlag, "debug", false, "set verbose logs (developers)")
+	rootCmd.PersistentFlags().BoolVar(&debugFlag, "debug", false, "set verbose logs")
 }
 
 // initConfig reads in config file and ENV variables if set.
