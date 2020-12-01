@@ -6,20 +6,19 @@ import (
 	"github.com/romie-gr/romie/internal/exceptions"
 )
 
-// EnVar checks if an environment variable exists and returns it.
-func EnVar(key string) (string, error) {
+// GetEnv returns the value of the environment variable named by the key. It returns an error, if any.
+func GetEnv(key string) (string, error) {
 	if key == "" {
 		return "", exceptions.Wrap(exceptions.ErrArg, "empty argument")
 	}
 
 	val, ok := os.LookupEnv(key)
+	if !ok {
+		return "", exceptions.Wrap(exceptions.ErrEnvVar, "environment variable not found")
+	}
 
 	if val == "" {
-		if !ok {
-			return "", exceptions.Wrap(exceptions.ErrEnvVar, "variable not found")
-		}
-
-		return "", exceptions.Wrap(exceptions.ErrEnvVar, "variable is empty")
+		return "", exceptions.Wrap(exceptions.ErrEnvVar, "environment variable is empty")
 	}
 
 	return val, nil
