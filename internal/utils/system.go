@@ -6,7 +6,7 @@ import (
 	"github.com/romie-gr/romie/internal/exceptions"
 )
 
-// GetEnv returns the value of the environment variable named by the key. It returns an error, if any.
+// GetEnv returns value of the environment variable named by the key if it's populated.
 func GetEnv(key string) (string, error) {
 	if key == "" {
 		return "", exceptions.Wrap(exceptions.ErrArg, "empty argument")
