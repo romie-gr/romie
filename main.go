@@ -19,6 +19,8 @@ limitations under the License.
 
 package main
 
+import "github.com/romie-gr/romie/cmd"
+
 func main() {
-	println("Hello romie")
+	cmd.Execute()
 }
