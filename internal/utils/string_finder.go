@@ -13,18 +13,22 @@ func StringContains(baseString string, stringlist ...string) bool {
 		log.Debug("String is empty")
 		return false
 	}
+
 	for index, str := range stringlist {
 		if strings.TrimSpace(str) == "" {
 			continue
 		}
+
 		if strings.Contains(
 			strings.ToLower(baseString),
 			strings.ToLower(str),
 		) {
-			log.Debug(fmt.Sprint("String contains arguement number ", index, ": ", str))
+			log.Debug(fmt.Sprint("String contains argument number ", index, ": ", str))
 			return true
 		}
 	}
-	log.Debug("String does not contain arguements")
+
+	log.Debug("String does not contain arguments")
+
 	return false
 }
