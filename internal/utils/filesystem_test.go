@@ -3,15 +3,13 @@ package utils
 import (
 	"fmt"
 	"testing"
-
-	"github.com/spf13/afero"
 )
 
 var (
-	existingFolder    = "/a-folder-that-exists"
-	nonExistingFolder = "/a-folder-that-does-not-exist"
-	existingFile      = "/a-folder-that-exists/file.txt"
-	nonExistingFile   = "/a-folder-that-exists/missing-file.txt"
+	existingFolder    = "./testdata/a-folder-that-exists"
+	nonExistingFolder = "./testdata/a-folder-that-does-not-exist"
+	existingFile      = "./testdata/a-folder-that-exists/file.txt"
+	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 )
 
 func ExampleFolderExists() {
@@ -25,11 +23,6 @@ func ExampleFolderExists() {
 }
 
 func TestFolderExists(t *testing.T) {
-	AppFS = &afero.Afero{Fs: afero.NewMemMapFs()}
-
-	_ = AppFS.Mkdir(existingFolder, 0755)
-	_, _ = AppFS.Create(existingFile)
-
 	tests := []struct {
 		name string
 		path string
@@ -77,11 +70,6 @@ func ExampleFileExists() {
 }
 
 func TestFileExists(t *testing.T) {
-	AppFS = &afero.Afero{Fs: afero.NewMemMapFs()}
-
-	_ = AppFS.Mkdir(existingFolder, 0755)
-	_, _ = AppFS.Create(existingFile)
-
 	tests := []struct {
 		name string
 		path string
