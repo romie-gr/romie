@@ -2,21 +2,21 @@ package utils
 
 import "fmt"
 
-// ArgError denotes that a function's argument was passed incorrectly.
-type ArgError struct {
-	msg string
+// argError denotes that a function's argument was passed incorrectly.
+type argError struct {
+	message string
 }
 
-func (e ArgError) Error() string {
-	return fmt.Sprintf("Argument error: %s", e.msg)
+func (e argError) Error() string {
+	return fmt.Sprintf("Argument error: %s", e.message)
 }
 
-// EnvVarError tracks environment variable errors.
-type EnvVarError struct {
-	key string
-	msg string
+// envVarError tracks environment variable errors.
+type envVarError struct {
+	key     string
+	message string
 }
 
-func (e EnvVarError) Error() string {
-	return fmt.Sprintf("Env variable error: %s: %s", e.msg, e.key)
+func (e envVarError) Error() string {
+	return fmt.Sprintf("Env variable error: %s: %s", e.message, e.key)
 }
