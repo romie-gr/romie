@@ -3,6 +3,7 @@ package archive
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/romie-gr/romie/internal/utils"
@@ -109,7 +110,7 @@ func TestUnzipTo(t *testing.T) {
 		},
 		{
 			"Returns error if provided path is non writable",
-			args{zipArchiveFile, "/sys"},
+			args{zipArchiveFile, nonWritableDir()},
 			true,
 			false,
 		},
@@ -132,6 +133,15 @@ func TestUnzipTo(t *testing.T) {
 			}
 		})
 	}
+}
+
+func nonWritableDir() string {
+	if runtime.GOOS == "windows" {
+		return "C:\\Windows\\System32"
+	}
+
+	// Linux and macOS
+	return "/sys"
 }
 
 func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
