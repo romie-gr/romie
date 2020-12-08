@@ -25,37 +25,31 @@ func TestUnzip(t *testing.T) {
 		name    string
 		source  string
 		wantErr bool
-		cleanUp bool
 	}{
 		{
 			"Returns error if file does not exist",
 			missingFile,
 			true,
-			false,
 		},
 		{
 			"Returns error if file is a directory",
 			existingFolder,
 			true,
-			false,
 		},
 		{
 			"Returns error if file not a zip archive",
 			nonZipFile,
 			true,
-			false,
 		},
 		{
 			"Returns error if file not a valid zip archive",
 			invalidZipFile,
 			true,
-			false,
 		},
 		{
 			"Returns no error if file is a valid zip archive",
 			zipArchiveFile,
 			false,
-			true,
 		},
 	}
 	for _, tt := range tests {
@@ -66,7 +60,7 @@ func TestUnzip(t *testing.T) {
 			}
 
 			// Assert file contents and cleanup
-			if tt.cleanUp {
+			if !tt.wantErr {
 				followUpAssertAndCleanUp(t, extractionPath)
 			}
 		})
@@ -83,43 +77,36 @@ func TestUnzipTo(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		cleanUp bool
 	}{
 		{
 			"Returns error if file does not exist",
 			args{missingFile, extractToPath},
 			true,
-			false,
 		},
 		{
 			"Returns error if file is a directory",
 			args{existingFolder, extractToPath},
 			true,
-			false,
 		},
 		{
 			"Returns error if file not a zip archive",
 			args{nonZipFile, extractToPath},
 			true,
-			false,
 		},
 		{
 			"Returns error if file not a valid zip archive",
 			args{invalidZipFile, extractToPath},
 			true,
-			false,
 		},
 		{
 			"Returns error if provided path is non writable",
 			args{zipArchiveFile, nonWritableDir},
 			true,
-			false,
 		},
 		{
 			"Returns no error if file is a valid zip archive",
 			args{zipArchiveFile, extractToPath},
 			false,
-			true,
 		},
 	}
 	for _, tt := range tests {
@@ -131,7 +118,7 @@ func TestUnzipTo(t *testing.T) {
 				t.Errorf("Unzip(%q, %q) error = %v, wantErr %v", tt.args.source, tt.args.destination, err, tt.wantErr)
 			}
 			// Assert file contents and cleanup
-			if tt.cleanUp {
+			if !tt.wantErr {
 				followUpAssertAndCleanUp(t, tt.args.destination)
 			}
 		})
