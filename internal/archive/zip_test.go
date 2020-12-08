@@ -109,7 +109,7 @@ func TestUnzipTo(t *testing.T) {
 		},
 		{
 			"Returns error if provided path is non writable",
-			args{zipArchiveFile, "/opt"},
+			args{zipArchiveFile, "/sys"},
 			true,
 			false,
 		},
