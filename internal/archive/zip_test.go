@@ -17,6 +17,7 @@ var (
 	zipArchiveFile = "./testdata/archive.zip"
 	extractionPath = "./testdata/archive"
 	extractToPath  = "./testdata/new-destination"
+	nonWritableDir = "/sys"
 )
 
 func TestUnzip(t *testing.T) {
@@ -110,7 +111,7 @@ func TestUnzipTo(t *testing.T) {
 		},
 		{
 			"Returns error if provided path is non writable",
-			args{zipArchiveFile, nonWritableDir()},
+			args{zipArchiveFile, nonWritableDir},
 			true,
 			false,
 		},
@@ -124,6 +125,8 @@ func TestUnzipTo(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			skipWindowsNonWritableDirScenario(t, tt.args.destination, tt.name)
+
 			if err := UnzipTo(tt.args.source, tt.args.destination); (err != nil) != tt.wantErr {
 				t.Errorf("Unzip(%q, %q) error = %v, wantErr %v", tt.args.source, tt.args.destination, err, tt.wantErr)
 			}
@@ -135,13 +138,10 @@ func TestUnzipTo(t *testing.T) {
 	}
 }
 
-func nonWritableDir() string {
-	if runtime.GOOS == "windows" {
-		return "C:\\Windows\\System32"
+func skipWindowsNonWritableDirScenario(t *testing.T, destination string, scenarioName string) {
+	if destination == nonWritableDir && runtime.GOOS == "windows" {
+		t.Skipf("Skip %q test in windows", scenarioName)
 	}
-
-	// Linux and macOS
-	return "/sys"
 }
 
 func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
