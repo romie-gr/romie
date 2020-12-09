@@ -1,6 +1,7 @@
 package archive
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"runtime"
@@ -19,6 +20,16 @@ var (
 	extractToPath  = "./testdata/new-destination"
 	nonWritableDir = "/sys"
 )
+
+func ExampleUnzip() {
+	err := Unzip("/path/to/archive.zip")
+	if err != nil {
+		fmt.Printf("Zip archive extraction failure: %v", err)
+	} else {
+		fmt.Println("Zip archive was successfully extracted")
+	}
+	// Output: Zip archive extraction failure: file /path/to/archive.zip not found
+}
 
 func TestUnzip(t *testing.T) {
 	tests := []struct {
@@ -65,6 +76,17 @@ func TestUnzip(t *testing.T) {
 			}
 		})
 	}
+}
+
+
+func ExampleUnzipTo() {
+	err := UnzipTo("/path/to/archive.zip", "/destination/folder")
+	if err != nil {
+		fmt.Printf("Zip archive extraction failure: %v", err)
+	} else {
+		fmt.Println("Zip archive was successfully extracted")
+	}
+	// Output: Zip archive extraction failure: file /path/to/archive.zip not found
 }
 
 func TestUnzipTo(t *testing.T) {
