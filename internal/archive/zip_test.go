@@ -78,7 +78,6 @@ func TestUnzip(t *testing.T) {
 	}
 }
 
-
 func ExampleUnzipTo() {
 	err := UnzipTo("/path/to/archive.zip", "/destination/folder")
 	if err != nil {
