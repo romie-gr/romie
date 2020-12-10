@@ -20,3 +20,11 @@ type envVarError struct {
 func (e envVarError) Error() string {
 	return fmt.Sprintf("Env variable error: %s: %s", e.message, e.key)
 }
+
+type missingFileError struct {
+	FilePath string
+}
+
+func (e missingFileError) Error() string {
+	return fmt.Sprintf("file %s not found", e.FilePath)
+}
