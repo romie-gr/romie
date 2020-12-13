@@ -15,16 +15,16 @@ type wrongFileExtensionError struct {
 }
 
 func (e wrongFileExtensionError) Error() string {
-	return fmt.Sprintf("wrong file extension: %s", e.Extension)
+	return fmt.Sprintf("invalid or unsupported file extension: %s", e.Extension)
 }
 
-type openZipError struct {
+type openArchiveError struct {
 	Source string
 	Err    error
 }
 
-func (e openZipError) Error() string {
-	return fmt.Sprintf("cannot open zip file: %s: %s", e.Source, e.Err)
+func (e openArchiveError) Error() string {
+	return fmt.Sprintf("cannot open archive: %s: %s", e.Source, e.Err)
 }
 
 type extractFileError struct {
