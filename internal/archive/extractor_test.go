@@ -3,6 +3,7 @@ package archive
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"testing"
 
@@ -121,7 +122,9 @@ func TestExtractTo(t *testing.T) {
 		destination string
 	}
 
-	os.Mkdir(nonWritableDir, 0400)
+	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
+		log.Fatal("Cannot create non writable directory")
+	}
 
 	tests := []struct {
 		name    string
