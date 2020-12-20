@@ -199,7 +199,6 @@ func TestExtractTo(t *testing.T) {
 
 func windowsDir(t *testing.T) string {
 	path, err := os.Getwd()
-
 	if err != nil {
 		t.Fatalf("Cannot get CWD on Windows: %v", err)
 	}
