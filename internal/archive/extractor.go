@@ -58,7 +58,7 @@ func (e extractor) extract() error {
 	}
 	defer archive.Close()
 
-	// Extract file in current directory
+	// Extract file in provided directory
 	_, err = archive.Extract(e.destination)
 	if err != nil {
 		log.Error(err.Error())
