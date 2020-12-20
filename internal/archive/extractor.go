@@ -73,7 +73,6 @@ func hasValidExtension(extension string) bool {
 	case
 		".zip",
 		".rar",
-		// ".tar",
 		".7z":
 		return true
 	}
