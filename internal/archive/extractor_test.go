@@ -126,6 +126,10 @@ func TestExtractTo(t *testing.T) {
 		log.Fatal("Cannot create non writable directory")
 	}
 
+if runtime.GOOS == "windows" {
+		nonWritableDir = filepath.Dir(`C:\windows\system32`)
+	}
+	
 	tests := []struct {
 		name    string
 		args    args
