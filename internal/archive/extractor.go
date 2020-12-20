@@ -6,7 +6,6 @@ import (
 
 	"github.com/gen2brain/go-unarr"
 	"github.com/romie-gr/romie/internal/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 type extractor struct {
@@ -40,20 +39,17 @@ func ExtractTo(source string, destination string) error {
 func (e extractor) extract() error {
 	// Check for file existence
 	if !utils.FileExists(e.source) {
-		log.Error("Error trying to identify path")
 		return missingFileError{e.source}
 	}
 
 	// Check file extension is one of the allowed archive extensions (.zip, .rar, or .7z)
 	if ext := filepath.Ext(e.source); !hasValidExtension(ext) {
-		log.Errorf("Invalid or unsupported archive extension '%s'", ext)
 		return wrongFileExtensionError{ext}
 	}
 
 	// Check file is archive
 	archive, err := unarr.NewArchive(e.source)
 	if err != nil {
-		log.Error("Archive is not valid")
 		return openArchiveError{e.source, err}
 	}
 	defer archive.Close()
@@ -61,7 +57,6 @@ func (e extractor) extract() error {
 	// Extract file in provided directory
 	_, err = archive.Extract(e.destination)
 	if err != nil {
-		log.Error(err.Error())
 		return extractFileError{e.source, err}
 	}
 
