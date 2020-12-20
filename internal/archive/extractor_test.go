@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -122,6 +123,10 @@ func TestExtractTo(t *testing.T) {
 		destination string
 	}
 
+	if runtime.GOOS == "windows" {
+		nonWritableDir = windowsDir(t)
+	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -181,7 +186,6 @@ func TestExtractTo(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			skipWindowsNonWritableDirScenario(t, tt.args.destination, tt.name)
 
 			if err := ExtractTo(tt.args.source, tt.args.destination); (err != nil) != tt.wantErr {
 				t.Errorf("Extract(%q, %q) error = %v, wantErr %v", tt.args.source, tt.args.destination, err, tt.wantErr)
@@ -194,10 +198,14 @@ func TestExtractTo(t *testing.T) {
 	}
 }
 
-func skipWindowsNonWritableDirScenario(t *testing.T, destination string, scenarioName string) {
-	if destination == nonWritableDir && runtime.GOOS == "windows" {
-		t.Skipf("Skip %q test in windows", scenarioName)
+func windowsDir(t *testing.T) string {
+	path, err := os.Getwd()
+
+	if err != nil {
+		t.Fatalf("Cannot get CWD on Windows: %v", err)
 	}
+
+	return filepath.Join(filepath.VolumeName(path), filepath.Dir("/Windows"))
 }
 
 func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
