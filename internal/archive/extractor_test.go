@@ -35,7 +35,7 @@ func ExampleExtract() {
 	if err != nil {
 		fmt.Printf("Zip archive extraction failure: %v", err)
 	} else {
-		fmt.Println("Zip archive was successfully extracted")
+		fmt.Println("Zip archive has been successfully extracted")
 	}
 	// Output: Zip archive extraction failure: file /path/to/archive.zip not found
 }
