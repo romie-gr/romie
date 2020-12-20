@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -16,7 +15,7 @@ var (
 	existingFolder = "./testdata"
 	extractionPath = "./testdata/archive"
 	extractToPath  = "./testdata/new-destination"
-	nonWritableDir = "./testdata/cannotWriteHere"
+	nonWritableDir = "./testdata/non-writable-dir"
 
 	missingArchive = "./testdata/missing.zip"
 	nonArchiveFile = "./testdata/archive.txt"
@@ -125,11 +124,7 @@ func TestExtractTo(t *testing.T) {
 	}
 
 	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
-		log.Fatal("Cannot create non writable directory")
-	}
-
-	if runtime.GOOS == "windows" {
-		nonWritableDir = filepath.Dir(`C:\windows\system32`)
+		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
 	}
 
 	tests := []struct {
@@ -191,6 +186,8 @@ func TestExtractTo(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			skipWindowsNonWritableDirScenario(t, tt.args.destination, tt.name)
+
 			if err := ExtractTo(tt.args.source, tt.args.destination); (err != nil) != tt.wantErr {
 				t.Errorf("Extract(%q, %q) error = %v, wantErr %v", tt.args.source, tt.args.destination, err, tt.wantErr)
 			}
@@ -199,6 +196,15 @@ func TestExtractTo(t *testing.T) {
 				followUpAssertAndCleanUp(t, tt.args.destination)
 			}
 		})
+	}
+
+	// Delete nonWritableDir to ensure test isolation
+	_ = os.RemoveAll(nonWritableDir)
+}
+
+func skipWindowsNonWritableDirScenario(t *testing.T, destination string, scenarioName string) {
+	if destination == nonWritableDir && runtime.GOOS == "windows" {
+		t.Skipf("Skip %q test in windows", scenarioName)
 	}
 }
 
