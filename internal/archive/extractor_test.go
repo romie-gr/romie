@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/romie-gr/romie/internal/utils"
@@ -123,9 +121,7 @@ func TestExtractTo(t *testing.T) {
 		destination string
 	}
 
-	if runtime.GOOS == "windows" {
-		nonWritableDir = windowsDir(t)
-	}
+	os.Mkdir(nonWritableDir, 0400)
 
 	tests := []struct {
 		name    string
@@ -195,15 +191,6 @@ func TestExtractTo(t *testing.T) {
 			}
 		})
 	}
-}
-
-func windowsDir(t *testing.T) string {
-	path, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Cannot get CWD on Windows: %v", err)
-	}
-
-	return filepath.Join(filepath.VolumeName(path), filepath.Dir("/Windows"))
 }
 
 func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
