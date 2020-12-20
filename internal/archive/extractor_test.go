@@ -194,10 +194,13 @@ func TestExtractTo(t *testing.T) {
 	}
 }
 
-func skipWindowsNonWritableDirScenario(t *testing.T, destination string, scenarioName string) {
-	if destination == nonWritableDir && runtime.GOOS == "windows" {
-		t.Skipf("Skip %q test in windows", scenarioName)
+func windowsDir(t *testing.T) string {
+	path, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Cannot get CWD on Windows: %v", err)
 	}
+
+	return filepath.Join(filepath.VolumeName(path), filepath.Dir("/Windows"))
 }
 
 func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
