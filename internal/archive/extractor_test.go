@@ -186,7 +186,6 @@ func TestExtractTo(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-
 			if err := ExtractTo(tt.args.source, tt.args.destination); (err != nil) != tt.wantErr {
 				t.Errorf("Extract(%q, %q) error = %v, wantErr %v", tt.args.source, tt.args.destination, err, tt.wantErr)
 			}
