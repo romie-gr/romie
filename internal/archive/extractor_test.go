@@ -15,7 +15,7 @@ var (
 	existingFolder = "./testdata"
 	extractionPath = "./testdata/archive"
 	extractToPath  = "./testdata/new-destination"
-	nonWritableDir = "/sys"
+	nonWritableDir = "./testdata/cannotWriteHere"
 
 	missingArchive = "./testdata/missing.zip"
 	nonArchiveFile = "./testdata/archive.txt"
