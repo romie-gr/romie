@@ -122,6 +122,10 @@ func TestExtractTo(t *testing.T) {
 		destination string
 	}
 
+	if runtime.GOOS == "windows" {
+		nonWritableDir = windowsDir(t)
+	}
+	
 	tests := []struct {
 		name    string
 		args    args
