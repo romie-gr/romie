@@ -5,6 +5,14 @@
 run:
   tests: true
 
+issues:
+  exclude-rules:
+    - linters:
+        - funlen
+      # Disable 'funlen' linter for test functions.
+      # It's common for table-driven tests to be more than 60 characters long
+      source: "^func Test"
+
 linters:
   enable-all: true
   disable:
