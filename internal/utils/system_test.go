@@ -65,7 +65,6 @@ func TestGetEnv(t *testing.T) {
 				t.Errorf("GetEnv() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			fmt.Println(err)
 			if got != tt.want {
 				t.Errorf("GetEnv() = %v, want %v", got, tt.want)
 			}
