@@ -43,6 +43,7 @@ func TestStringContains(t *testing.T) {
 		{"String with whitespace 2 search", baseWhitespace, []string{" 	"}, false},
 		{"String with whitespace 3 search", baseWhitespace, []string{""}, false},
 		{"String empty search", baseEmpty, []string{""}, false},
+		{"String full args empty search", baseString, []string{""}, false},
 	}
 
 	for _, tt := range tests {

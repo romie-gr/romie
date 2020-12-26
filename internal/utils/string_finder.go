@@ -10,25 +10,23 @@ import (
 // StringContains searches for a string in a series of strings
 func StringContains(baseString string, stringlist ...string) bool {
 	if strings.TrimSpace(baseString) == "" {
-		log.Debug("String is empty")
+		log.Debug("Input string is empty")
 		return false
 	}
 
-	for index, str := range stringlist {
-		if strings.TrimSpace(str) == "" {
+	for i, s := range stringlist {
+		if strings.TrimSpace(s) == "" {
 			continue
 		}
 
 		if strings.Contains(
 			strings.ToLower(baseString),
-			strings.ToLower(str),
+			strings.ToLower(s),
 		) {
-			log.Debug(fmt.Sprint("String contains argument number ", index, ": ", str))
+			log.Debug(fmt.Sprint("Input string contains argument number ", i, ": ", s))
 			return true
 		}
 	}
-
-	log.Debug("String does not contain arguments")
 
 	return false
 }
