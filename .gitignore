@@ -2,4 +2,5 @@
 .idea/
 coverage.txt
 romie
+romie.exe
 bin/goreleaser

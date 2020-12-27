@@ -1,23 +1,34 @@
 package utils
 
 import (
-	"fmt"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// FolderExists reports whether the provided directory exists.
-func FolderExists(path string) bool {
+// Exists reports whether the named file or directory exists.
+func exists(path string, isDir bool) bool {
 	if path == "" {
 		log.Debug("Path is empty")
 		return false
 	}
 
-	exists, err := AppFS.DirExists(path)
+	info, err := os.Stat(path)
 	if err != nil {
-		log.Debug(fmt.Printf("Error: %s", err.Error()))
-		return false
+		if os.IsNotExist(err) {
+			return false
+		}
 	}
 
-	return exists
+	return isDir == info.IsDir()
+}
+
+// FolderExists reports whether the provided directory exists.
+func FolderExists(path string) bool {
+	return exists(path, true)
+}
+
+// FileExists reports whether the provided file exists.
+func FileExists(path string) bool {
+	return exists(path, false)
 }

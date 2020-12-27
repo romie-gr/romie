@@ -3,14 +3,13 @@ package utils
 import (
 	"fmt"
 	"testing"
-
-	"github.com/spf13/afero"
 )
 
 var (
-	existingFolder    = "/a-folder-that-exists"
-	nonExistingFolder = "/a-folder-that-does-not-exist"
-	existingFile      = "/a-folder-that-exists/file.txt"
+	existingFolder    = "./testdata/a-folder-that-exists"
+	nonExistingFolder = "./testdata/a-folder-that-does-not-exist"
+	existingFile      = "./testdata/a-folder-that-exists/file.txt"
+	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 )
 
 func ExampleFolderExists() {
@@ -24,11 +23,6 @@ func ExampleFolderExists() {
 }
 
 func TestFolderExists(t *testing.T) {
-	AppFS = &afero.Afero{Fs: afero.NewMemMapFs()}
-
-	_ = AppFS.Mkdir(existingFolder, 0755)
-	_, _ = AppFS.Create(existingFile)
-
 	tests := []struct {
 		name string
 		path string
@@ -60,6 +54,53 @@ func TestFolderExists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := FolderExists(tt.path); got != tt.want {
 				t.Errorf("FolderExists(%q) = %v, want %v", tt.path, got, tt.want)
+			}
+		})
+	}
+}
+
+func ExampleFileExists() {
+	exists := FileExists("/missing-file.txt")
+	if exists {
+		fmt.Println("File exists")
+	} else {
+		fmt.Println("File does not exist")
+	}
+	// Output: File does not exist
+}
+
+func TestFileExists(t *testing.T) {
+	tests := []struct {
+		name string
+		path string
+		want bool
+	}{
+		{
+			"Returns true when given file exists",
+			existingFile,
+			true,
+		},
+		{
+			"Returns false when given file does not exist",
+			nonExistingFile,
+			false,
+		},
+		{
+			"Returns false when provided path is a directory",
+			existingFolder,
+			false,
+		},
+		{
+			"Returns false when provided path is empty",
+			"",
+			false,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FileExists(tt.path); got != tt.want {
+				t.Errorf("FileExists(%q) = %v, want %v", tt.path, got, tt.want)
 			}
 		})
 	}
