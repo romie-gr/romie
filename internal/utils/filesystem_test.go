@@ -2,6 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -70,6 +73,9 @@ func ExampleFileExists() {
 }
 
 func TestFileExists(t *testing.T) {
+	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
+		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
+	}
 	tests := []struct {
 		name string
 		path string
@@ -83,6 +89,16 @@ func TestFileExists(t *testing.T) {
 		{
 			"Returns false when given file does not exist",
 			nonExistingFile,
+			false,
+		},
+		{
+			"Returns false when given file and its parent folder do not exist",
+			filepath.Join(nonExistingFolder, "missing-file.txt"),
+			false,
+		},
+		{
+			"Returns false when file is into a folder without read permissions",
+			filepath.Join(nonWritableDir, "missing-file.txt"),
 			false,
 		},
 		{
@@ -104,4 +120,5 @@ func TestFileExists(t *testing.T) {
 			}
 		})
 	}
+	_ = os.RemoveAll(nonWritableDir)
 }
