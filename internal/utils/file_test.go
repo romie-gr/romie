@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -62,6 +64,8 @@ func TestCreateFile(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			skipWindowsNonWritableDirScenario(t, tt.filepath, tt.name)
+
 			if err := CreateFile(tt.filepath); (err != nil) != tt.wantErr {
 				t.Errorf("CreateFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -71,6 +75,12 @@ func TestCreateFile(t *testing.T) {
 	_ = os.Remove(nonExistingFile)
 	_ = os.RemoveAll(nonWritableDir)
 	_ = os.RemoveAll(nonExistingFolder)
+}
+
+func skipWindowsNonWritableDirScenario(t *testing.T, file string, scenarioName string) {
+	if strings.Contains(filepath.Base(nonWritableDir), file) && runtime.GOOS == "windows" {
+		t.Skipf("Skip %q test in windows", scenarioName)
+	}
 }
 
 func ExamplecreateDir() {
@@ -127,6 +137,8 @@ func Test_createDir(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			skipWindowsNonWritableDirScenario(t, tt.path, tt.name)
+
 			if err := createDir(tt.path); (err != nil) != tt.wantErr {
 				t.Errorf("createDir() error = %v, wantErr %v", err, tt.wantErr)
 			}
