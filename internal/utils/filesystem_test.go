@@ -13,6 +13,7 @@ var (
 	nonExistingFolder = "./testdata/a-folder-that-does-not-exist"
 	existingFile      = "./testdata/a-folder-that-exists/file.txt"
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
+	nonWritableDir    = "./testdata/non-writable-dir"
 )
 
 func ExampleFolderExists() {
