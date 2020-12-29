@@ -11,7 +11,7 @@ import (
 var (
 	existingFolder    = "./testdata/a-folder-that-exists"
 	nonExistingFolder = "./testdata/a-folder-that-does-not-exist"
-	existingFile      = "./testdata/a-folder-that-exists/file.txt"
+	existingFile      = "./testdata/a-folder-that-exists/a-file-that-exists.txt"
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 	nonWritableDir    = "./testdata/non-writable-dir"
 )
