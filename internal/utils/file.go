@@ -18,7 +18,7 @@ func CreateFile(filepath string) error {
 
 	// Create the parent directory if doesn't exist
 	if directory := osfile.Dir(filepath); !FolderExists(directory) {
-		if err := createDir(directory); err != nil {
+		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 			return fmt.Errorf("failed to create directory %v", directory)
 		}
 	}
@@ -30,8 +30,4 @@ func CreateFile(filepath string) error {
 	defer file.Close()
 
 	return nil
-}
-
-func createDir(newpath string) error {
-	return os.MkdirAll(newpath, os.ModePerm)
 }
