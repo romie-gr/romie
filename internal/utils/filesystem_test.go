@@ -77,6 +77,7 @@ func TestFileExists(t *testing.T) {
 	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
 		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
 	}
+
 	tests := []struct {
 		name string
 		path string
@@ -113,6 +114,7 @@ func TestFileExists(t *testing.T) {
 			false,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -121,5 +123,6 @@ func TestFileExists(t *testing.T) {
 			}
 		})
 	}
+
 	_ = os.RemoveAll(nonWritableDir)
 }
