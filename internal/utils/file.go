@@ -11,7 +11,7 @@ import (
 // along with any necessary parents, and returns nil,
 // or else returns an error.
 func CreateFile(filepath string) error {
-	// Avoid truncate, but return error instead
+	// Avoid file truncate and return error instead
 	if FileExists(filepath) {
 		return fmt.Errorf("file %s already exists", filepath)
 	}
