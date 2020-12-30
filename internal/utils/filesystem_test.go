@@ -94,11 +94,6 @@ func TestFileExists(t *testing.T) {
 			false,
 		},
 		{
-			"Returns false when given file and its parent folder do not exist",
-			filepath.Join(nonExistingFolder, "missing-file.txt"),
-			false,
-		},
-		{
 			"Returns false when file is into a folder without read permissions",
 			filepath.Join(nonWritableDir, "missing-file.txt"),
 			false,
