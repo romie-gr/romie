@@ -12,13 +12,11 @@ import (
 
 func ExampleIsOnline() {
 	google, _ := url.Parse("https://google.com")
-	hostOK, err := IsOnline(*google)
+	err := IsOnline(*google)
 
 	if err != nil {
-		log.Error(err)
-	}
-
-	if hostOK {
+		fmt.Println("Host is not accessible")
+	} else {
 		fmt.Println("Host is accessible")
 	}
 	// Output: Host is accessible
@@ -63,49 +61,41 @@ func Test_IsOnline(t *testing.T) {
 	tests := []struct {
 		name     string
 		scenario string
-		hostOk   bool
 		wantErr  bool
 	}{
 		{
 			"Succeeds with 200",
 			"OK",
-			true,
 			false,
 		},
 		{
 			"Succeeds with other 200-code (202)",
 			"Accepted",
-			true,
 			false,
 		},
 		{
 			"Succeeds after following a redirect (301)",
 			"Redirect",
-			true,
 			false,
 		},
 		{
 			"Fails if page replies with not generic error (400)",
 			"BadRequest",
-			false,
 			true,
 		},
 		{
 			"Fails if page replies with not found error (404)",
 			"NotFound",
-			false,
 			true,
 		},
 		{
 			"Fails if page replies with too many requests error (429)",
 			"RateLimit",
-			false,
 			true,
 		},
 		{
 			"Fails if page replies with internal server error (500)",
 			"ServerError",
-			false,
 			true,
 		},
 	}
@@ -116,10 +106,7 @@ func Test_IsOnline(t *testing.T) {
 			defer ts.Close()
 			testURL, _ := url.Parse(ts.URL)
 
-			got, err := IsOnline(*testURL)
-			if got != tt.hostOk {
-				t.Errorf("IsOnline(%q) got = %v, want %v", testURL.String(), got, tt.hostOk)
-			}
+			err := IsOnline(*testURL)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsOnline(%q) error = %v, wantErr %v", testURL.String(), err, tt.wantErr)
 			}
@@ -130,11 +117,7 @@ func Test_IsOnline(t *testing.T) {
 func Test_IsOnline_MissingHost(t *testing.T) {
 	testURL, _ := url.Parse("https://does-not-exist.romie-gr.romie.com")
 
-	hostOk, err := IsOnline(*testURL)
-	if hostOk != false {
-		t.Errorf("IsOnline(%q) got = %v, want %v", testURL.String(), hostOk, false)
-	}
-
+	err := IsOnline(*testURL)
 	if (err != nil) != true {
 		t.Errorf("IsOnline(%q) error = %v, wantErr %v", testURL.String(), err, true)
 	}
