@@ -2,6 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -10,6 +13,7 @@ var (
 	nonExistingFolder = "./testdata/a-folder-that-does-not-exist"
 	existingFile      = "./testdata/a-folder-that-exists/file.txt"
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
+	nonWritableDir    = "./testdata/non-writable-dir"
 )
 
 func ExampleFolderExists() {
@@ -70,6 +74,10 @@ func ExampleFileExists() {
 }
 
 func TestFileExists(t *testing.T) {
+	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
+		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
+	}
+
 	tests := []struct {
 		name string
 		path string
@@ -86,6 +94,11 @@ func TestFileExists(t *testing.T) {
 			false,
 		},
 		{
+			"Returns false when file is into a folder without read permissions",
+			filepath.Join(nonWritableDir, "missing-file.txt"),
+			false,
+		},
+		{
 			"Returns false when provided path is a directory",
 			existingFolder,
 			false,
@@ -96,6 +109,7 @@ func TestFileExists(t *testing.T) {
 			false,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -104,4 +118,6 @@ func TestFileExists(t *testing.T) {
 			}
 		})
 	}
+
+	_ = os.RemoveAll(nonWritableDir)
 }

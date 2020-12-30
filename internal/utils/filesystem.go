@@ -15,7 +15,7 @@ func exists(path string, isDir bool) bool {
 
 	info, err := os.Stat(path)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if os.IsNotExist(err) || os.IsPermission(err) {
 			return false
 		}
 	}
