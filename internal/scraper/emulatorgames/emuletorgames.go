@@ -4,6 +4,7 @@ package emulatorgames
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	log "github.com/sirupsen/logrus"
@@ -20,6 +21,8 @@ var (
 )
 
 func Parse(console string) {
+	defer utils.TimeTrack(time.Now(), "EmulatorGames Parser")
+
 	if !utils.StringContains(console, emulatorGamesValidConsoles...) {
 		log.Panicf("Platform %s is not yet supported", console)
 	}
