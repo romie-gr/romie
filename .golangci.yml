@@ -27,3 +27,5 @@ linters:
     - gochecknoinits
     - godot
     - exhaustivestruct
+    # https://github.com/golangci/golangci-lint/issues/541
+    - interfacer
