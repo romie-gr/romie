@@ -14,6 +14,7 @@ var (
 	existingFile      = "./testdata/a-folder-that-exists/file.txt"
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 	nonWritableDir    = "./testdata/non-writable-dir"
+	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted"
 )
 
 func createFile(path string) {
@@ -84,19 +85,6 @@ func ExampleFileExists() {
 	// Output: File does not exist
 }
 
-func ExampleRemove() {
-	filename := "./testdata/a-file-to-be-deleted"
-	createFile(filename)
-	err := Remove(filename)
-
-	if err == nil {
-		fmt.Println("File deleted")
-	} else {
-		fmt.Println("Unable to delete file")
-	}
-	// Output: File deleted
-}
-
 func TestFileExists(t *testing.T) {
 	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
 		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
@@ -146,9 +134,20 @@ func TestFileExists(t *testing.T) {
 	_ = os.RemoveAll(nonWritableDir)
 }
 
+func ExampleRemove() {
+	createFile(fileToDelete)
+	err := Remove(fileToDelete)
+
+	if err == nil {
+		fmt.Println("File deleted")
+	} else {
+		fmt.Println("Unable to delete file")
+	}
+	// Output: File deleted
+}
+
 func TestRemove(t *testing.T) {
-	filename := "./testdata/a-file-to-be-deleted"
-	createFile(filename)
+	createFile(fileToDelete)
 
 	tests := []struct {
 		name    string
@@ -156,22 +155,22 @@ func TestRemove(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Delete file that exists",
-			filename,
+			"Returns nil if existing file is deleted",
+			fileToDelete,
 			false,
 		},
 		{
-			"Delete folder that exists",
+			"Returns err when asked to delete folder",
 			existingFolder,
 			true,
 		},
 		{
-			"Delete file that does not exist",
+			"Returns err when asked to delete file that does not exist",
 			nonExistingFile,
 			true,
 		},
 		{
-			"Receive empty path as argument",
+			"Returns err if argument is empty path",
 			"",
 			true,
 		},

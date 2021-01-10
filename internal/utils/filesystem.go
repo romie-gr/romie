@@ -36,7 +36,6 @@ func FileExists(path string) bool {
 // Remove deletes the specified file
 func Remove(path string) error {
 	if path == "" {
-		log.Debug("Path is empty")
 		return argError{"empty argument"}
 	}
 
