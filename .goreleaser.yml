@@ -37,19 +37,19 @@ builds:
 dockers:
   - goos: linux
     goarch: amd64
-    binaries:
-    - romie
+    ids:
+      - romie
     image_templates:
       - "romie/romie:latest"
       - "romie/romie:{{ .Tag }}"
     skip_push: false
     dockerfile: Dockerfile
     build_flag_templates:
-    - "--pull"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
 nfpms:
   - id: "default"
