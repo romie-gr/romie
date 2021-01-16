@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/libopenstorage/openstorage/pkg/chattr"
 )
 
 var (
@@ -149,6 +151,8 @@ func ExampleRemove() {
 
 func TestRemove(t *testing.T) {
 	createFile(fileToDelete)
+	chattr.AddImmutable(fileNotToDelete)
+	defer chattr.RemoveImmutable(fileNotToDelete)
 
 	tests := []struct {
 		name    string
