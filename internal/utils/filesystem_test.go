@@ -14,7 +14,8 @@ var (
 	existingFile      = "./testdata/a-folder-that-exists/file.txt"
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 	nonWritableDir    = "./testdata/non-writable-dir"
-	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted"
+	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted.txt"
+	fileNotToDelete   = "./testdata/a-folder-that-exists/a-file-not-to-be-deleted.txt"
 )
 
 func createFile(path string) {
@@ -167,6 +168,11 @@ func TestRemove(t *testing.T) {
 		{
 			"Returns err when asked to delete file that does not exist",
 			nonExistingFile,
+			true,
+		},
+		{
+			"Returns err if asked to delete file that cannot be deleted ",
+			fileNotToDelete,
 			true,
 		},
 		{
