@@ -149,10 +149,22 @@ func ExampleRemove() {
 	// Output: File deleted
 }
 
+func removeCleanup() {
+	err := chattr.RemoveImmutable(fileNotToDelete)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
 func TestRemove(t *testing.T) {
 	createFile(fileToDelete)
-	chattr.AddImmutable(fileNotToDelete)
-	defer chattr.RemoveImmutable(fileNotToDelete)
+
+	err := chattr.AddImmutable(fileNotToDelete)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer removeCleanup()
 
 	tests := []struct {
 		name    string
