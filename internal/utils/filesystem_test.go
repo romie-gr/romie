@@ -152,16 +152,17 @@ func ExampleRemove() {
 func removeCleanup() {
 	err := chattr.RemoveImmutable(fileNotToDelete)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Cannot remove immutable file %s", err)
 	}
 }
+
 func TestRemove(t *testing.T) {
 	createFile(fileToDelete)
 
 	err := chattr.AddImmutable(fileNotToDelete)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Cannot create immutable file %s", err)
 	}
 
 	defer removeCleanup()
