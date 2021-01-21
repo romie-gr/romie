@@ -15,7 +15,6 @@ import (
 
 var (
 	emulatorGamesValidConsoles = []string{"playstation"}
-	currentPage                string
 	collectedGames             []string
 	collectedPages             []string
 )
@@ -29,14 +28,8 @@ func Parse(console string) {
 
 	uri := fmt.Sprintf("https://www.emulatorgames.net/roms/%s/", console)
 
-	currentPage = uri
-	document := parseListPage()
-
-	if hasPaginationLinks(document) {
-		for _, paginationURL := range collectedPages {
-			currentPage = paginationURL
-			_ = parseListPage()
-		}
+	for _, paginationURL := range collectPaginationLinks(uri) {
+		parseListPage(paginationURL)
 	}
 
 	for _, gameURL := range collectedGames {
@@ -63,11 +56,9 @@ func parseAndGetDocument(uri string) *goquery.Document {
 	return document
 }
 
-func parseListPage() *goquery.Document {
-	document := parseAndGetDocument(currentPage)
+func parseListPage(uri string) {
+	document := parseAndGetDocument(uri)
 	document.Find("a.eg-box").Each(processGameLink)
-
-	return document
 }
 
 func processGameLink(_ int, element *goquery.Selection) {
@@ -77,16 +68,21 @@ func processGameLink(_ int, element *goquery.Selection) {
 	}
 }
 
-func hasPaginationLinks(document *goquery.Document) bool {
+func collectPaginationLinks(uri string) []string {
+	// Add current page, so even if there are no pagination links
+	// the current page will be returned
+	_ = append(collectedPages, uri)
+
+	document := parseAndGetDocument(uri)
 	document.Find("a.page-link").Each(processPaginationLink)
 
-	return len(collectedPages) > 0
+	return collectedPages
 }
 
 // Finds and collects unique pagination links
 func processPaginationLink(_ int, element *goquery.Selection) {
 	href, exists := element.Attr("href")
-	if exists && href != "#" && href != currentPage {
+	if exists && href != "#" {
 		collectedPages = appendIfMissing(collectedPages, href)
 	}
 }
