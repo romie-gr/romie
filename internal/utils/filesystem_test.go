@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/libopenstorage/openstorage/pkg/chattr"
 )
 
 var (
@@ -14,7 +16,20 @@ var (
 	existingFile      = "./testdata/a-folder-that-exists/a-file-that-exists.txt"
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 	nonWritableDir    = "./testdata/non-writable-dir"
+	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted.txt"
+	fileNotToDelete   = "./testdata/a-folder-that-exists/a-file-not-to-be-deleted.txt"
 )
+
+func createFile(path string) {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		file, err := os.Create(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+	}
+}
 
 func ExampleFolderExists() {
 	exists := FolderExists("/a-non-existing-folder")
@@ -120,4 +135,77 @@ func TestFileExists(t *testing.T) {
 	}
 
 	_ = os.RemoveAll(nonWritableDir)
+}
+
+func ExampleRemove() {
+	createFile(fileToDelete)
+	err := Remove(fileToDelete)
+
+	if err == nil {
+		fmt.Println("File deleted")
+	} else {
+		fmt.Println("Unable to delete file")
+	}
+	// Output: File deleted
+}
+
+func removeCleanup() {
+	err := chattr.RemoveImmutable(fileNotToDelete)
+	if err != nil {
+		log.Fatalf("Cannot remove immutable file %s", err)
+	}
+}
+
+func TestRemove(t *testing.T) {
+	createFile(fileToDelete)
+
+	err := chattr.AddImmutable(fileNotToDelete)
+
+	if err != nil {
+		log.Fatalf("Cannot create immutable file %s", err)
+	}
+
+	defer removeCleanup()
+
+	tests := []struct {
+		name    string
+		path    string
+		wantErr bool
+	}{
+		{
+			"Returns nil if existing file is deleted",
+			fileToDelete,
+			false,
+		},
+		{
+			"Returns err when asked to delete folder",
+			existingFolder,
+			true,
+		},
+		{
+			"Returns err when asked to delete file that does not exist",
+			nonExistingFile,
+			true,
+		},
+		{
+			"Returns err if asked to delete file that cannot be deleted ",
+			fileNotToDelete,
+			true,
+		},
+		{
+			"Returns err if argument is empty path",
+			"",
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			err := Remove(tt.path)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Remove() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
