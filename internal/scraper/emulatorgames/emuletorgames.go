@@ -45,7 +45,7 @@ func Parse(console string) {
 	}
 }
 
-func parseAndGetDocument(uri string) *goquery.Document {
+func ParseAndGetDocument(uri string) *goquery.Document {
 	// Make HTTP request
 	response, err := http.Get(uri)
 	if err != nil {
@@ -64,7 +64,7 @@ func parseAndGetDocument(uri string) *goquery.Document {
 }
 
 func parseListPage() *goquery.Document {
-	document := parseAndGetDocument(currentPage)
+	document := ParseAndGetDocument(currentPage)
 	document.Find("a.eg-box").Each(processGameLink)
 
 	return document
@@ -102,7 +102,7 @@ func appendIfMissing(slice []string, i string) []string {
 }
 
 func parseGame(gameURL string, console string) {
-	document := parseAndGetDocument(gameURL)
+	document := ParseAndGetDocument(gameURL)
 	name, _ := document.Find("h1[itemprop='name']").Html()
 	lang, _ := document.Find(".eg-meta").Html()
 
