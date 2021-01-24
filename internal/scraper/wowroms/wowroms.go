@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/romie-gr/romie/internal/scraper"
@@ -20,11 +21,11 @@ import (
 const wowroms = "https://wowroms.com"
 
 var console string
+var wg sync.WaitGroup
 
 func Parse(_console string) {
 	defer utils.TimeTrack(time.Now(), "Wowroms Parser")
 
-	// TODO MAKE CLASS?
 	console = _console
 	url := fmt.Sprintf("%s/en/roms/list/%s/", wowroms, console)
 
@@ -32,17 +33,20 @@ func Parse(_console string) {
 
 	pageNum := getNumberOfPages(document)
 
-	// TODO GOROUTINIZE
 	for i := 1; i <= pageNum; i++ {
 		// Create url that points to this page number
 		pageUrl := fmt.Sprintf("%s?page=%d", url, i)
 
 		// Parse each page
-		parsePage(pageUrl)
+		wg.Add(1)
+		go parsePage(pageUrl)
 	}
+
+	wg.Wait()
 }
 
 func parsePage(url string) {
+	defer wg.Done()
 	var gameUrls []string
 
 	document := emulatorgames.ParseAndGetDocument(url)
@@ -52,15 +56,15 @@ func parsePage(url string) {
 		gameUrls = append(gameUrls, wowroms+gameLink)
 	})
 
-	// TODO GOROUTINIZE
 	for _, gameUrl := range gameUrls {
-		parseGame(gameUrl)
+		wg.Add(1)
+		go parseGame(gameUrl)
 	}
 
 }
 
 func parseGame(url string) {
-	//fmt.Println(url)
+	defer wg.Done()
 	document := emulatorgames.ParseAndGetDocument(url)
 
 	downloadRef, _ := document.Find("a.btn.btn-prev.col-md-24.btnDwn").Attr("href")
