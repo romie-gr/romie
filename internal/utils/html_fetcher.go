@@ -9,7 +9,7 @@ import (
 
 //GetHTMLObj returns the HTML document for a user provided url
 func GetHTMLObj(url string) (*goquery.Document, error) {
-	res, err := http.Get("https://www.lifauau.gr/")
+	res, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
@@ -18,7 +18,6 @@ func GetHTMLObj(url string) (*goquery.Document, error) {
 		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
-	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		return nil, fmt.Errorf("goquery is unable to parse the returned html")
