@@ -103,9 +103,8 @@ func appendIfMissing(slice []string, i string) []string {
 	return append(slice, i)
 }
 
-// GetDownloadLink returns the direct download link for a given game URL
-func GetDownloadLink(gameURL string) (downloadLink string, err error) {
-
+// getDownloadLink returns the direct download link for a given game URL
+func getDownloadLink(gameURL string) (downloadLink string, err error) {
 	// Create a temp directory (why? Because it starts downloading automatically after 10 seconds)
 	var dir string
 	if dirPath, err := os.Getwd(); err != nil {
@@ -116,16 +115,17 @@ func GetDownloadLink(gameURL string) (downloadLink string, err error) {
 			panic(err)
 		}
 	}
-	defer os.RemoveAll(dir) // remove the directory (including the half-finished downloaded file)
+	// remove the directory (including the half-finished downloaded file)
+	defer os.RemoveAll(dir)
 
-	// Create our custom context background
+	// Create a custom context background
 	ctx, cancel := chromedp.NewContext(
 		context.Background(),
 		chromedp.WithLogf(log.Printf),
 	)
 	defer cancel()
 
-	// Set the timeout limit as par the context
+	// Set the timeout limit as part the context
 	ctx, cancel = context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
@@ -141,32 +141,35 @@ func GetDownloadLink(gameURL string) (downloadLink string, err error) {
 		chromedp.Flag("disable-client-side-phishing-detection", false),
 		chromedp.Flag("disable-background-timer-throttling", false),
 		chromedp.WindowSize(1200, 800),
-		chromedp.Flag("headless", false), // just for debugging this code
+		chromedp.Flag("headless", true),
 		chromedp.Flag("hide-scrollbars", false),
 		// chromedp.DisableGPU,
 		chromedp.UserDataDir(dir),
 	)
 
-	// Apply the browser settings into the browser
+	// Apply browser settings to chromedp instance
 	allocCtx, cancel := chromedp.NewExecAllocator(ctx, opts...)
 	defer cancel()
 
 	// Life is not perfect. This code is triggered when there's either a timeout or error occurs
 	taskCtx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
+
 	defer func() {
-		fmt.Println("close browser")
+		log.Debug("close browser")
 		cancel()
 	}()
 
-	// clicky-here-clicky-there-wait-a-bit-and-click-over-there
+	// click-here-click-there-wait-a-bit-and-click-over-there
 	var ok bool
 	err = chromedp.Run(taskCtx,
 		chromedp.Navigate(gameURL),
 		chromedp.Click("/html/body/div[3]/div[2]/div[3]/form[1]/button"),
+
 		chromedp.ActionFunc(logAction("Save Game is clicked")),
-		chromedp.Sleep(time.Millisecond*600),
-		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(dir), // download the file into a specfic dir
+		chromedp.Sleep(time.Millisecond * 600),
+		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(dir), // download the file into a specific dir
 		chromedp.WaitVisible("/html/body/div[3]/div[2]/div[1]/p/span[2]/a"),
+
 		chromedp.ActionFunc(logAction("Download link is available")),
 		chromedp.AttributeValue("/html/body/div[3]/div[2]/div[1]/p/span[2]/a", "href", &downloadLink, &ok),
 	)
@@ -185,7 +188,7 @@ func parseGame(gameURL string, console string) {
 	document := parseAndGetDocument(gameURL)
 	name, _ := document.Find("h1[itemprop='name']").Html()
 	lang, _ := document.Find(".eg-meta").Html()
-	downloadLink, err := GetDownloadLink(gameURL)
+	downloadLink, err := getDownloadLink(gameURL)
 	if err != nil {
 		downloadLink = "n/a"
 	}
