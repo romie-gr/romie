@@ -18,10 +18,8 @@ var scrapeCmd = &cobra.Command{
 		switch source {
 		case "emulatorgames":
 			emulatorgames.Parse(console)
-			break
 		default:
 			log.Fatalf("Source %s found", source)
-			break
 		}
 	},
 }

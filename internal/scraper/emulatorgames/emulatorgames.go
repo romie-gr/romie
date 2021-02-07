@@ -4,7 +4,6 @@ package emulatorgames
 import (
 	"context"
 	"fmt"
-	"github.com/chromedp/cdproto/page"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 	log "github.com/sirupsen/logrus"
 
@@ -104,9 +104,11 @@ func appendIfMissing(slice []string, i string) []string {
 }
 
 // getDownloadLink returns the direct download link for a given game URL
+// nolint:funlen
 func getDownloadLink(gameURL string) (downloadLink string, err error) {
 	// Create a temp directory (why? Because it starts downloading automatically after 10 seconds)
 	var dir string
+
 	if dirPath, err := os.Getwd(); err != nil {
 		log.Println(err)
 	} else {
@@ -115,6 +117,7 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 			panic(err)
 		}
 	}
+
 	// remove the directory (including the half-finished downloaded file)
 	defer os.RemoveAll(dir)
 
@@ -166,14 +169,17 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 		chromedp.Click("/html/body/div[3]/div[2]/div[3]/form[1]/button"),
 
 		chromedp.ActionFunc(logAction("Save Game is clicked")),
-		chromedp.Sleep(time.Millisecond * 600),
-		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(dir), // download the file into a specific dir
+		chromedp.Sleep(time.Millisecond*600),
+
+		// download the file into a specific dir
+		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(dir),
 		chromedp.WaitVisible("/html/body/div[3]/div[2]/div[1]/p/span[2]/a"),
 
 		chromedp.ActionFunc(logAction("Download link is available")),
 		chromedp.AttributeValue("/html/body/div[3]/div[2]/div[1]/p/span[2]/a", "href", &downloadLink, &ok),
 	)
 
+	//nolint:wrapcheck
 	return strings.TrimSpace(downloadLink), err
 }
 
@@ -189,6 +195,7 @@ func parseGame(gameURL string, console string) {
 	name, _ := document.Find("h1[itemprop='name']").Html()
 	lang, _ := document.Find(".eg-meta").Html()
 	downloadLink, err := getDownloadLink(gameURL)
+
 	if err != nil {
 		downloadLink = "n/a"
 	}
