@@ -150,11 +150,7 @@ func removeCleanup() {
 func TestRemove(t *testing.T) {
 	_ = CreateFile(fileToDelete)
 
-	err := chattr.AddImmutable(fileNotToDelete)
-
-	if err != nil {
-		log.Fatalf("Cannot create immutable file %s", err)
-	}
+	createImmutableFile(fileNotToDelete)
 
 	defer removeCleanup()
 
@@ -273,5 +269,11 @@ func TestCreateFile(t *testing.T) {
 func skipWindowsNonWritableDirScenario(t *testing.T, file string, scenarioName string) {
 	if strings.Contains(file, filepath.Base(nonWritableDir)) && runtime.GOOS == "windows" {
 		t.Skipf("Skip %q test in windows", scenarioName)
+	}
+}
+
+func createImmutableFile(file string) {
+	if err := chattr.AddImmutable(file); err != nil {
+		log.Fatalf("Cannot create immutable file %s", err)
 	}
 }
