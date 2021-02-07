@@ -1,11 +1,9 @@
-//nolint:gosec,noctx
 package emulatorgames
 
 import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -23,10 +21,13 @@ var (
 	emulatorGamesValidConsoles = []string{"playstation"}
 	collectedGames             []string
 	collectedPages             []string
+	options                    scraper.ScrapeOptions
 )
 
-func Parse(console string) {
+func Parse(_options scraper.ScrapeOptions, console string) {
 	defer utils.TimeTrack(time.Now(), "EmulatorGames Parser")
+
+	options = _options
 
 	if !utils.StringContains(console, emulatorGamesValidConsoles...) {
 		log.Panicf("Platform %s is not yet supported", console)
@@ -43,26 +44,8 @@ func Parse(console string) {
 	}
 }
 
-func parseAndGetDocument(uri string) *goquery.Document {
-	// Make HTTP request
-	response, err := http.Get(uri)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer response.Body.Close()
-
-	// Create a goquery document from the HTTP response
-	document, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		log.Errorf("Error loading HTTP response body (%v)", err)
-		return nil
-	}
-
-	return document
-}
-
 func parseListPage(uri string) {
-	document := parseAndGetDocument(uri)
+	document := utils.ParseAndGetDocument(uri)
 	document.Find("a.eg-box").Each(processGameLink)
 }
 
@@ -78,7 +61,7 @@ func collectPaginationLinks(uri string) []string {
 	// the current page will be returned
 	_ = append(collectedPages, uri)
 
-	document := parseAndGetDocument(uri)
+	document := utils.ParseAndGetDocument(uri)
 	document.Find("a.page-link").Each(processPaginationLink)
 
 	return collectedPages
@@ -106,19 +89,19 @@ func appendIfMissing(slice []string, i string) []string {
 // nolint:funlen
 func getDownloadLink(gameURL string) (downloadLink string, err error) {
 	// Create a temp directory (why? Because it starts downloading automatically after 10 seconds)
-	var dir string
+	var tempDownloadPath string
 
 	if dirPath, err := os.Getwd(); err != nil {
 		log.Println(err)
 	} else {
-		dir, err = ioutil.TempDir(dirPath, "chromedp-example")
+		tempDownloadPath, err = ioutil.TempDir(dirPath, "chromedp-example")
 		if err != nil {
 			panic(err)
 		}
 	}
 
 	// remove the directory (including the half-finished downloaded file)
-	defer os.RemoveAll(dir)
+	defer os.RemoveAll(tempDownloadPath)
 
 	// Create a custom context background
 	ctx, cancel := chromedp.NewContext(
@@ -143,10 +126,10 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 		chromedp.Flag("disable-client-side-phishing-detection", false),
 		chromedp.Flag("disable-background-timer-throttling", false),
 		chromedp.WindowSize(1200, 800),
-		chromedp.Flag("headless", true),
+		chromedp.Flag("headless", options.Headless),
 		chromedp.Flag("hide-scrollbars", false),
 		// chromedp.DisableGPU,
-		chromedp.UserDataDir(dir),
+		chromedp.UserDataDir(tempDownloadPath),
 	)
 
 	// Apply browser settings to chromedp instance
@@ -167,14 +150,14 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 		chromedp.Navigate(gameURL),
 		chromedp.Click("/html/body/div[3]/div[2]/div[3]/form[1]/button"),
 
-		chromedp.ActionFunc(scraper.LogAction("Save Game is clicked")),
+		chromedp.ActionFunc(scraper.LogAction("Clicked on 'Save Game'")),
 		chromedp.Sleep(time.Millisecond*600),
 
-		// download the file into a specific dir
-		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(dir),
+		// download the file into a specific tempDownloadPath
+		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(tempDownloadPath),
 		chromedp.WaitVisible("/html/body/div[3]/div[2]/div[1]/p/span[2]/a"),
 
-		chromedp.ActionFunc(scraper.LogAction("Download link is available")),
+		chromedp.ActionFunc(scraper.LogAction("Found download link")),
 		chromedp.AttributeValue("/html/body/div[3]/div[2]/div[1]/p/span[2]/a", "href", &downloadLink, &ok),
 	)
 
@@ -183,7 +166,7 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 }
 
 func parseGame(gameURL string, console string) {
-	document := parseAndGetDocument(gameURL)
+	document := utils.ParseAndGetDocument(gameURL)
 	name, _ := document.Find("h1[itemprop='name']").Html()
 	lang, _ := document.Find(".eg-meta").Html()
 	downloadLink, err := getDownloadLink(gameURL)

@@ -12,3 +12,7 @@ func LogAction(logStr string) func(context.Context) error {
 		return nil
 	}
 }
+
+type ScrapeOptions struct {
+	Headless bool
+}
