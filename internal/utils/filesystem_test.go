@@ -127,7 +127,7 @@ func TestFileExists(t *testing.T) {
 }
 
 func ExampleRemove() {
-	CreateFile(fileToDelete)
+	_ = CreateFile(fileToDelete)
 	err := Remove(fileToDelete)
 
 	if err == nil {
@@ -146,7 +146,7 @@ func removeCleanup() {
 }
 
 func TestRemove(t *testing.T) {
-	CreateFile(fileToDelete)
+	_ = CreateFile(fileToDelete)
 
 	err := chattr.AddImmutable(fileNotToDelete)
 
