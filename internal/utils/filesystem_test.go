@@ -20,17 +20,6 @@ var (
 	fileNotToDelete   = "./testdata/a-folder-that-exists/a-file-not-to-be-deleted.txt"
 )
 
-func createFile(path string) {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		file, err := os.Create(path)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
-	}
-}
-
 func ExampleFolderExists() {
 	exists := FolderExists("/a-non-existing-folder")
 	if exists {
@@ -138,7 +127,7 @@ func TestFileExists(t *testing.T) {
 }
 
 func ExampleRemove() {
-	createFile(fileToDelete)
+	CreateFile(fileToDelete)
 	err := Remove(fileToDelete)
 
 	if err == nil {
@@ -157,7 +146,7 @@ func removeCleanup() {
 }
 
 func TestRemove(t *testing.T) {
-	createFile(fileToDelete)
+	CreateFile(fileToDelete)
 
 	err := chattr.AddImmutable(fileNotToDelete)
 
