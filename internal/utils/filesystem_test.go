@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/libopenstorage/openstorage/pkg/chattr"
@@ -19,17 +21,6 @@ var (
 	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted.txt"
 	fileNotToDelete   = "./testdata/a-folder-that-exists/a-file-not-to-be-deleted.txt"
 )
-
-func createFile(path string) {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		file, err := os.Create(path)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
-	}
-}
 
 func ExampleFolderExists() {
 	exists := FolderExists("/a-non-existing-folder")
@@ -137,9 +128,9 @@ func TestFileExists(t *testing.T) {
 	_ = os.RemoveAll(nonWritableDir)
 }
 
-func ExampleRemove() {
-	createFile(fileToDelete)
-	err := Remove(fileToDelete)
+func ExampleRemoveFile() {
+	_ = CreateFile(fileToDelete)
+	err := RemoveFile(fileToDelete)
 
 	if err == nil {
 		fmt.Println("File deleted")
@@ -156,14 +147,10 @@ func removeCleanup() {
 	}
 }
 
-func TestRemove(t *testing.T) {
-	createFile(fileToDelete)
+func TestRemoveFile(t *testing.T) {
+	_ = CreateFile(fileToDelete)
 
-	err := chattr.AddImmutable(fileNotToDelete)
-
-	if err != nil {
-		log.Fatalf("Cannot create immutable file %s", err)
-	}
+	createImmutableFile(fileNotToDelete)
 
 	defer removeCleanup()
 
@@ -202,10 +189,91 @@ func TestRemove(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			err := Remove(tt.path)
+			err := RemoveFile(tt.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Remove() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("RemoveFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func ExampleCreateFile() {
+	err := CreateFile(existingFile)
+	if err != nil {
+		fmt.Println("Failed to create file because it already exists")
+	} else {
+		fmt.Println("File has been created successfully!")
+	}
+	// Output: Failed to create file because it already exists
+}
+
+func TestCreateFile(t *testing.T) {
+	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
+		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
+	}
+
+	defer func() {
+		_ = os.Remove(nonExistingFile)
+		_ = os.RemoveAll(nonWritableDir)
+		_ = os.RemoveAll(nonExistingFolder)
+	}()
+
+	tests := []struct {
+		name     string
+		filepath string
+		wantErr  bool
+	}{
+		{
+			"Returns nil if file is created",
+			nonExistingFile,
+			false,
+		},
+		{
+			"Returns err if file is exists",
+			existingFile,
+			true,
+		},
+		{
+			"Returns nil if file is created along with parent dirs",
+			filepath.Join(nonExistingFolder, "file.txt"),
+			false,
+		},
+		{
+			"Returns err if cannot write the file",
+			filepath.Join(nonWritableDir, "should-not-write-this.txt"),
+			true,
+		},
+		{
+			"Returns err when provided filepath is empty",
+			"",
+			true,
+		},
+		{
+			"Returns err if parent directory couldn't be created",
+			filepath.Join(nonWritableDir, "parent/newdir/file.txt"),
+			true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			skipWindowsNonWritableDirScenario(t, tt.filepath, tt.name)
+
+			if err := CreateFile(tt.filepath); (err != nil) != tt.wantErr {
+				t.Errorf("CreateFile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func skipWindowsNonWritableDirScenario(t *testing.T, file string, scenarioName string) {
+	if strings.Contains(file, filepath.Base(nonWritableDir)) && runtime.GOOS == "windows" {
+		t.Skipf("Skip %q test in windows", scenarioName)
+	}
+}
+
+func createImmutableFile(file string) {
+	if err := chattr.AddImmutable(file); err != nil {
+		log.Fatalf("Cannot create immutable file %s", err)
 	}
 }
