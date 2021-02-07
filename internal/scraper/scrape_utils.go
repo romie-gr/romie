@@ -1,6 +1,5 @@
 package scraper
 
-
 import (
 	"context"
 

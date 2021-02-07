@@ -128,7 +128,7 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 	defer cancel()
 
 	// Set the timeout limit as part the context
-	ctx, cancel = context.WithTimeout(ctx, 1 * time.Minute)
+	ctx, cancel = context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
 	// Open the browser using the previously created context
