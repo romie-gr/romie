@@ -36,8 +36,8 @@ func FileExists(path string) bool {
 	return exists(path, false)
 }
 
-// Remove deletes the specified file
-func Remove(path string) error {
+// RemoveFile deletes the specified file
+func RemoveFile(path string) error {
 	if path == "" {
 		return argError{"empty argument"}
 	}

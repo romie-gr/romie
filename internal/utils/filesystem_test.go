@@ -128,9 +128,9 @@ func TestFileExists(t *testing.T) {
 	_ = os.RemoveAll(nonWritableDir)
 }
 
-func ExampleRemove() {
+func ExampleRemoveFile() {
 	_ = CreateFile(fileToDelete)
-	err := Remove(fileToDelete)
+	err := RemoveFile(fileToDelete)
 
 	if err == nil {
 		fmt.Println("File deleted")
@@ -147,7 +147,7 @@ func removeCleanup() {
 	}
 }
 
-func TestRemove(t *testing.T) {
+func TestRemoveFile(t *testing.T) {
 	_ = CreateFile(fileToDelete)
 
 	createImmutableFile(fileNotToDelete)
@@ -189,9 +189,9 @@ func TestRemove(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			err := Remove(tt.path)
+			err := RemoveFile(tt.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Remove() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("RemoveFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
