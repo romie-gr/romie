@@ -40,7 +40,6 @@ func Parse(console string) {
 
 	for _, gameURL := range collectedGames {
 		parseGame(gameURL, console)
-		log.Printf("Game: %s", gameURL)
 	}
 }
 
@@ -168,26 +167,19 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 		chromedp.Navigate(gameURL),
 		chromedp.Click("/html/body/div[3]/div[2]/div[3]/form[1]/button"),
 
-		chromedp.ActionFunc(logAction("Save Game is clicked")),
+		chromedp.ActionFunc(scraper.LogAction("Save Game is clicked")),
 		chromedp.Sleep(time.Millisecond*600),
 
 		// download the file into a specific dir
 		page.SetDownloadBehavior(page.SetDownloadBehaviorBehaviorAllow).WithDownloadPath(dir),
 		chromedp.WaitVisible("/html/body/div[3]/div[2]/div[1]/p/span[2]/a"),
 
-		chromedp.ActionFunc(logAction("Download link is available")),
+		chromedp.ActionFunc(scraper.LogAction("Download link is available")),
 		chromedp.AttributeValue("/html/body/div[3]/div[2]/div[1]/p/span[2]/a", "href", &downloadLink, &ok),
 	)
 
 	//nolint:wrapcheck
 	return strings.TrimSpace(downloadLink), err
-}
-
-func logAction(logStr string) func(context.Context) error {
-	return func(context.Context) error {
-		log.Info(logStr)
-		return nil
-	}
 }
 
 func parseGame(gameURL string, console string) {
