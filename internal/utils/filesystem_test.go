@@ -8,8 +8,6 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-
-	"github.com/libopenstorage/openstorage/pkg/chattr"
 )
 
 var (
@@ -19,7 +17,6 @@ var (
 	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
 	nonWritableDir    = "./testdata/non-writable-dir"
 	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted.txt"
-	fileNotToDelete   = "./testdata/a-folder-that-exists/a-file-not-to-be-deleted.txt"
 )
 
 func ExampleFolderExists() {
@@ -140,19 +137,8 @@ func ExampleRemoveFile() {
 	// Output: File deleted
 }
 
-func removeCleanup() {
-	err := chattr.RemoveImmutable(fileNotToDelete)
-	if err != nil {
-		log.Fatalf("Cannot remove immutable file %s", err)
-	}
-}
-
 func TestRemoveFile(t *testing.T) {
 	_ = CreateFile(fileToDelete)
-
-	createImmutableFile(fileNotToDelete)
-
-	defer removeCleanup()
 
 	tests := []struct {
 		name    string
@@ -172,11 +158,6 @@ func TestRemoveFile(t *testing.T) {
 		{
 			"Returns err when asked to delete file that does not exist",
 			nonExistingFile,
-			true,
-		},
-		{
-			"Returns err if asked to delete file that cannot be deleted ",
-			fileNotToDelete,
 			true,
 		},
 		{
@@ -269,11 +250,5 @@ func TestCreateFile(t *testing.T) {
 func skipWindowsNonWritableDirScenario(t *testing.T, file string, scenarioName string) {
 	if strings.Contains(file, filepath.Base(nonWritableDir)) && runtime.GOOS == "windows" {
 		t.Skipf("Skip %q test in windows", scenarioName)
-	}
-}
-
-func createImmutableFile(file string) {
-	if err := chattr.AddImmutable(file); err != nil {
-		log.Fatalf("Cannot create immutable file %s", err)
 	}
 }
