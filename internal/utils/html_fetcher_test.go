@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,10 +12,12 @@ import (
 
 func ExampleGetHTML() {
 	var doc interface{}
+
 	doc, err := GetHTML("https://www.google.com/")
 	if err != nil {
 		fmt.Println("Document could not be retrieved")
 	}
+
 	_, ok := doc.(*goquery.Document)
 	if ok {
 		fmt.Println("HTML Document successfully returned")
@@ -29,21 +30,19 @@ func ExampleGetHTML() {
 func MockServer(testCase string) *httptest.Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch testCase {
-		case "a":
+		case "OK":
 			w.WriteHeader(http.StatusOK)
-			io.WriteString(w, "<html><body>Hello World!</body></html>")
 			return
-		case "b":
+		case "REDIRECT":
 			http.Redirect(w, r, "https://google.com", http.StatusMovedPermanently)
-			io.WriteString(w, "<html><body>Hello World!</body></html>")
 			return
-		case "c":
+		case "BADREQUEST":
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
-		case "d":
+		case "NOTFOUND":
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
-		case "e":
+		case "SERVERERROR":
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusNotFound)
 			return
 		default:
@@ -51,6 +50,7 @@ func MockServer(testCase string) *httptest.Server {
 			return
 		}
 	}))
+
 	return ts
 }
 
@@ -61,28 +61,28 @@ func TestGetHTML(t *testing.T) {
 		wantErr  bool
 	}{
 		{
+			"HTTP status code is 200, html object downloaded",
 			"OK",
-			"a",
 			false,
 		},
 		{
-			"Redirect",
-			"b",
+			"HTTP status code is 301 (redirection), html object downloaded",
+			"REDIRECT",
 			false,
 		},
 		{
-			"BadRequest",
-			"c",
+			"HTTP status code is 400 (bad request), html object not downloaded",
+			"BADREQUEST",
 			true,
 		},
 		{
-			"NotFound",
-			"d",
+			"HTTP status code is 404 (not found), html object not downloaded",
+			"NOTFOUND",
 			true,
 		},
 		{
-			"ServerError",
-			"d",
+			"HTTP status code is 500 (server error), html object not downloaded",
+			"SERVERERROR",
 			true,
 		},
 	}
