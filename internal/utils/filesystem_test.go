@@ -8,18 +8,17 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-
-	"github.com/libopenstorage/openstorage/pkg/chattr"
 )
 
 var (
-	existingFolder    = "./testdata/a-folder-that-exists"
-	nonExistingFolder = "./testdata/a-folder-that-does-not-exist"
-	existingFile      = "./testdata/a-folder-that-exists/file.txt"
-	nonExistingFile   = "./testdata/a-folder-that-exists/missing-file.txt"
-	nonWritableDir    = "./testdata/non-writable-dir"
-	fileToDelete      = "./testdata/a-folder-that-exists/a-file-to-be-deleted.txt"
-	fileNotToDelete   = "./testdata/a-folder-that-exists/a-file-not-to-be-deleted.txt"
+	existingFolder        = "./testdata/a-folder-that-exists"
+	nonExistingFolder     = "./testdata/a-folder-that-does-not-exist"
+	existingFile          = "./testdata/a-folder-that-exists/file.txt"
+	nonExistingFile       = "./testdata/a-folder-that-exists/missing-file.txt"
+	alteredPermissionsDir = "./testdata/altered-permissions-dir"
+	nonReadableFile       = "./testadata/altered-permissions-dir/non-readable-file.txt"
+	fileToDelete          = "./testdata/a-folder-that-exists/a-file-to-be-deleted.txt"
+	fileNotToDelete       = "./testdata/altered-permissions-dir/a-file-not-to-be-deleted.txt"
 )
 
 func ExampleFolderExists() {
@@ -80,9 +79,11 @@ func ExampleFileExists() {
 }
 
 func TestFileExists(t *testing.T) {
-	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
-		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
+	if err := os.Chmod(alteredPermissionsDir, 0300); err != nil {
+		log.Fatalf("Cannot set permissions on directory %q", alteredPermissionsDir)
 	}
+
+	defer resetAlteredPermissionsDir()
 
 	tests := []struct {
 		name string
@@ -101,7 +102,7 @@ func TestFileExists(t *testing.T) {
 		},
 		{
 			"Returns false when file is into a folder without read permissions",
-			filepath.Join(nonWritableDir, "missing-file.txt"),
+			nonReadableFile,
 			false,
 		},
 		{
@@ -119,13 +120,12 @@ func TestFileExists(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			skipWindowsAlteredPermissionsDirScenario(t, tt.path, tt.name)
 			if got := FileExists(tt.path); got != tt.want {
 				t.Errorf("FileExists(%q) = %v, want %v", tt.path, got, tt.want)
 			}
 		})
 	}
-
-	_ = os.RemoveAll(nonWritableDir)
 }
 
 func ExampleRemoveFile() {
@@ -140,24 +140,19 @@ func ExampleRemoveFile() {
 	// Output: File deleted
 }
 
-func removeCleanup() {
-	err := chattr.RemoveImmutable(fileNotToDelete)
-	if err != nil {
-		log.Fatalf("Cannot remove immutable file %s", err)
-	}
-}
-
 func TestRemoveFile(t *testing.T) {
 	_ = CreateFile(fileToDelete)
 
-	createImmutableFile(fileNotToDelete)
+	if err := os.Chmod(alteredPermissionsDir, 0500); err != nil {
+		log.Fatalf("Cannot set permissions on directory %q", alteredPermissionsDir)
+	}
 
-	defer removeCleanup()
+	defer resetAlteredPermissionsDir()
 
 	tests := []struct {
-		name    string
-		path    string
-		wantErr bool
+		name     string
+		filepath string
+		wantErr  bool
 	}{
 		{
 			"Returns nil if existing file is deleted",
@@ -175,7 +170,7 @@ func TestRemoveFile(t *testing.T) {
 			true,
 		},
 		{
-			"Returns err if asked to delete file that cannot be deleted ",
+			"Returns err if asked to delete file that cannot be deleted (parent dir non-writable)",
 			fileNotToDelete,
 			true,
 		},
@@ -189,8 +184,9 @@ func TestRemoveFile(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			err := RemoveFile(tt.path)
-			if (err != nil) != tt.wantErr {
+			skipWindowsAlteredPermissionsDirScenario(t, tt.filepath, tt.name)
+
+			if err := RemoveFile(tt.filepath); (err != nil) != tt.wantErr {
 				t.Errorf("RemoveFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -208,20 +204,21 @@ func ExampleCreateFile() {
 }
 
 func TestCreateFile(t *testing.T) {
-	if err := os.Mkdir(nonWritableDir, 0400); err != nil {
-		log.Fatalf("Cannot create non writable directory %q", nonWritableDir)
+	if err := os.Chmod(alteredPermissionsDir, 0500); err != nil {
+		log.Fatalf("Cannot set permissions on directory %q", alteredPermissionsDir)
 	}
 
 	defer func() {
 		_ = os.Remove(nonExistingFile)
-		_ = os.RemoveAll(nonWritableDir)
 		_ = os.RemoveAll(nonExistingFolder)
+
+		resetAlteredPermissionsDir()
 	}()
 
 	tests := []struct {
-		name     string
-		filepath string
-		wantErr  bool
+		name    string
+		path    string
+		wantErr bool
 	}{
 		{
 			"Returns nil if file is created",
@@ -240,7 +237,7 @@ func TestCreateFile(t *testing.T) {
 		},
 		{
 			"Returns err if cannot write the file",
-			filepath.Join(nonWritableDir, "should-not-write-this.txt"),
+			filepath.Join(alteredPermissionsDir, "should-not-write-this.txt"),
 			true,
 		},
 		{
@@ -250,30 +247,30 @@ func TestCreateFile(t *testing.T) {
 		},
 		{
 			"Returns err if parent directory couldn't be created",
-			filepath.Join(nonWritableDir, "parent/newdir/file.txt"),
+			filepath.Join(alteredPermissionsDir, "parent/newdir/file.txt"),
 			true,
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			skipWindowsNonWritableDirScenario(t, tt.filepath, tt.name)
+			skipWindowsAlteredPermissionsDirScenario(t, tt.path, tt.name)
 
-			if err := CreateFile(tt.filepath); (err != nil) != tt.wantErr {
+			if err := CreateFile(tt.path); (err != nil) != tt.wantErr {
 				t.Errorf("CreateFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func skipWindowsNonWritableDirScenario(t *testing.T, file string, scenarioName string) {
-	if strings.Contains(file, filepath.Base(nonWritableDir)) && runtime.GOOS == "windows" {
+func skipWindowsAlteredPermissionsDirScenario(t *testing.T, file string, scenarioName string) {
+	if strings.Contains(file, filepath.Base(alteredPermissionsDir)) && runtime.GOOS == "windows" {
 		t.Skipf("Skip %q test in windows", scenarioName)
 	}
 }
 
-func createImmutableFile(file string) {
-	if err := chattr.AddImmutable(file); err != nil {
-		log.Fatalf("Cannot create immutable file %s", err)
+func resetAlteredPermissionsDir() {
+	if err := os.Chmod(alteredPermissionsDir, 0755); err != nil {
+		log.Fatalf("Cannot set permissions on directory %q", alteredPermissionsDir)
 	}
 }
