@@ -3,58 +3,58 @@ package scraper
 import "fmt"
 
 type Rom struct {
-	name         string
-	console      string
-	language     string
-	link         string
-	downloadLink string
-	version      string
-	releaseYear  int
+	Name         string `json:"name"`
+	Console      string `json:"console"`
+	Language     string `json:"language"`
+	Link         string	`json:"link"`
+	DownloadLink string	`json:"downloadLink"`
+	Version      string	`json:"version"`
+	ReleaseYear  int	`json:"releaseYear"`
 }
 
 // NewRom factory constructor
 func NewRom(name string, console string, language string, link string, downloadLink string) *Rom {
 	return &Rom{
-		name:         name,
-		console:      console,
-		language:     language,
-		link:         link,
-		downloadLink: downloadLink,
-		version:      "0.0",
-		releaseYear:  1970,
+		Name:         name,
+		Console:      console,
+		Language:     language,
+		Link:         link,
+		DownloadLink: downloadLink,
+		Version:      "0.0",
+		ReleaseYear:  1970,
 	}
 }
 
-func (r *Rom) Name() string {
-	return r.name
+func (r *Rom) GetName() string {
+	return r.Name
 }
 
-func (r *Rom) Version() string {
-	return r.version
+func (r *Rom) GetVersion() string {
+	return r.Version
 }
 
 func (r *Rom) SetVersion(version string) {
-	r.version = version
+	r.Version = version
 }
 
-func (r *Rom) ReleaseYear() int {
-	return r.releaseYear
+func (r *Rom) GetReleaseYear() int {
+	return r.ReleaseYear
 }
 
 func (r *Rom) SetReleaseYear(releaseYear int) {
-	r.releaseYear = releaseYear
+	r.ReleaseYear = releaseYear
 }
 
 func (r *Rom) Stringer() string {
 	return fmt.Sprintf(`Game: %s (v. %s) for %s. Released in %d [Lang: %s]
 Parsed via %s
 Download via %s`,
-		r.name,
-		r.version,
-		r.console,
-		r.releaseYear,
-		r.language,
-		r.link,
-		r.downloadLink,
+		r.Name,
+		r.Version,
+		r.Console,
+		r.ReleaseYear,
+		r.Language,
+		r.Link,
+		r.DownloadLink,
 	)
 }
