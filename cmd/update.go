@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"net/url"
+	"os"
+
 	"github.com/romie-gr/romie/internal/utils"
 	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
 	log "github.com/sirupsen/logrus"
-	"net/url"
-	"os"
 
 	"github.com/spf13/cobra"
 )

@@ -3,11 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+
 	"github.com/romie-gr/romie/internal/utils"
 	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"log"
 )
 
 var Title string

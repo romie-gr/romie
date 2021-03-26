@@ -3,11 +3,6 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"github.com/romie-gr/romie/internal/archive"
-	"github.com/romie-gr/romie/internal/scraper"
-	"github.com/romie-gr/romie/internal/utils"
-	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
@@ -17,6 +12,12 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/romie-gr/romie/internal/archive"
+	"github.com/romie-gr/romie/internal/scraper"
+	"github.com/romie-gr/romie/internal/utils"
+	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 )
@@ -150,7 +151,6 @@ func printDownloadPercent(done chan int64, savePath string, totalFilesize int64)
 
 			fmt.Printf("\rDownload progress: %d%% - %d/%d MB", int64(percent), currentMB, totalMB)
 		}
-
 
 		if stop {
 			break
