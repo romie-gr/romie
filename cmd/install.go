@@ -102,6 +102,12 @@ var installCmd = &cobra.Command{
 				continue
 			}
 			log.Infof("done!\n\n")
+
+			// Now Remove the downloaded compress file
+			log.Debugf("Delete %s", filePath)
+			if err := os.Remove(filePath); err != nil {
+				log.Errorf("Couldn't delete %s\nError: %q", filePath, err)
+			}
 		}
 
 	},
