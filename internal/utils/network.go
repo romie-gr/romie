@@ -34,8 +34,9 @@ func IsOnline(url url.URL) error {
 
 // ParseAndGetDocument fetches the GoQuery document object for a given link
 func ParseAndGetDocument(uri string) *goquery.Document {
-	// Make HTTP request
-	response, err := http.Get(uri)
+	// #nosec
+	response, err := http.Get(uri) // Make HTTP request
+
 	if err != nil {
 		log.Fatal(err)
 	}

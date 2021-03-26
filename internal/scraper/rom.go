@@ -6,10 +6,10 @@ type Rom struct {
 	Name         string `json:"name"`
 	Console      string `json:"console"`
 	Language     string `json:"language"`
-	Link         string	`json:"link"`
-	DownloadLink string	`json:"downloadLink"`
-	Version      string	`json:"version"`
-	ReleaseYear  int	`json:"releaseYear"`
+	Link         string `json:"link"`
+	DownloadLink string `json:"downloadLink"`
+	Version      string `json:"version"`
+	ReleaseYear  int    `json:"releaseYear"`
 }
 
 // NewRom factory constructor

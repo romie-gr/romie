@@ -3,11 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+
 	"github.com/romie-gr/romie/internal/utils"
 	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"log"
 )
 
 var Title string
@@ -28,7 +29,7 @@ var searchCmd = &cobra.Command{
 
 		notFound := true
 		for _, rom := range emulatorgames.Roms {
-			if utils.StringContains(rom.Name, Title){
+			if utils.StringContains(rom.Name, Title) {
 				notFound = false
 				fmt.Println(rom.Console, rom.Name, rom.Version, rom.Language, rom.DownloadLink)
 			}
@@ -52,6 +53,7 @@ func readDBFile(file string) []byte {
 	if err != nil {
 		log.Fatalf("Could not read the file.\nError: %s\n", err)
 	}
+
 	return fileJSON
 }
 
@@ -59,6 +61,7 @@ func readDBFile(file string) []byte {
 func jsonToEmuDB(file string) {
 	fileJSON := readDBFile(file)
 	err := json.Unmarshal(fileJSON, &emulatorgames.Roms)
+
 	if err != nil {
 		log.Fatalf("The %s is not a valid JSON format: %v", file, err)
 	}

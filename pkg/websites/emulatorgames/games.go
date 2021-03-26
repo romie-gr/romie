@@ -2,15 +2,16 @@ package emulatorgames
 
 import (
 	"context"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/page"
-	"github.com/romie-gr/romie/internal/scraper"
-	"github.com/romie-gr/romie/internal/utils"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/page"
+	"github.com/romie-gr/romie/internal/scraper"
+	"github.com/romie-gr/romie/internal/utils"
 
 	"github.com/chromedp/chromedp"
 	log "github.com/sirupsen/logrus"
@@ -28,7 +29,9 @@ func processGameLink(_ int, element *goquery.Selection) {
 		if err := utils.IsOnline(*pageURL); err != nil {
 			log.Fatalf("page %s is not accessible: %v", pageURL, err)
 		}
+
 		log.Debugf("Page %s is accessible.", pageURL)
+
 		collectedGames = append(collectedGames, href)
 	}
 }
