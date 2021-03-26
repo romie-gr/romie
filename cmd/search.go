@@ -3,12 +3,11 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
-
 	"github.com/romie-gr/romie/internal/utils"
 	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"log"
 )
 
 var Title string
@@ -18,8 +17,6 @@ var searchCmd = &cobra.Command{
 	Use:   "search",
 	Short: "Search game ROMs",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("search called")
-
 		// EmulatorGames.Net
 		if !utils.FileExists(emulatorgames.DBFile) {
 			log.Fatalf("There is no database for EmulatorGames.Net: %s", emulatorgames.DBFile)
@@ -31,7 +28,7 @@ var searchCmd = &cobra.Command{
 		for _, rom := range emulatorgames.Roms {
 			if utils.StringContains(rom.Name, Title) {
 				notFound = false
-				fmt.Println(rom.Console, rom.Name, rom.Version, rom.Language, rom.DownloadLink)
+				fmt.Printf("%15s | %s\n", rom.Console, rom.Name)
 			}
 		}
 
