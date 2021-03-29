@@ -26,7 +26,8 @@ build: fmt
 ## setup: Runs mod download and generate
 setup:
 	@echo "Downloading tools and dependencies..."
-	@bash hacks/golangci.sh
+	@$(GOCMD) get -u
+	@$(GOCMD) mod tidy
 	@$(GOCMD) mod download -x
 	@$(GOCMD) generate -v ./...
 
