@@ -127,6 +127,7 @@ func cleanup(dirPath string) {
 
 func printDownloadPercent(done chan int64, savePath string, totalFilesize int64) {
 	var stop = false
+
 	var totalMB int64
 
 	for {
@@ -134,7 +135,6 @@ func printDownloadPercent(done chan int64, savePath string, totalFilesize int64)
 		case <-done:
 			stop = true
 		default:
-
 			file, err := os.Open(savePath)
 			if err != nil {
 				log.Error(err)
@@ -152,6 +152,7 @@ func printDownloadPercent(done chan int64, savePath string, totalFilesize int64)
 			}
 
 			var percent = float64(currentDownloadedSize) / float64(totalFilesize) * 100
+
 			currentMB := currentDownloadedSize / 1024 / 1024
 			totalMB = totalFilesize / 1024 / 1024
 
@@ -164,16 +165,16 @@ func printDownloadPercent(done chan int64, savePath string, totalFilesize int64)
 
 		time.Sleep(time.Second)
 	}
-	fmt.Printf("\rDownload progress: 100%% - %d/%d MB\n", totalMB, totalMB)
+	fmt.Printf("\rDownload progress: 100%% - %d/%d MB\n", totalMB, totalMB) // noforbidigo
 }
 
-func downloadFile(gameName, url, dest string, current, total int) error {
-
+func downloadFile(name, url, dest string, current, total int) error {
 	file := path.Base(url)
 
-	log.Printf("[%d/%d] - Downloading: \"%s\"\tfrom\t\"%s\"\n", current, total, gameName, url)
+	log.Printf("[%d/%d] - Downloading: \"%s\"\tfrom\t\"%s\"\n", current, total, name, url)
 
 	var path bytes.Buffer
+
 	path.WriteString(dest)
 	path.WriteString("/")
 	path.WriteString(file)
@@ -184,15 +185,17 @@ func downloadFile(gameName, url, dest string, current, total int) error {
 
 	if err != nil {
 		log.Debugf("Failed at: 'os.Create(path.String()'\n")
+
 		return err
 	}
 
 	defer out.Close()
 
-	headResp, err := http.Head(url)
+	headResp, err := http.Head(url) // nogosec
 
 	if err != nil {
 		log.Debugf("Failed at: 'http.Head(url)'\n")
+
 		return err
 	}
 
@@ -202,6 +205,7 @@ func downloadFile(gameName, url, dest string, current, total int) error {
 
 	if err != nil {
 		log.Debugf("Failed at: 'strconv.Atoi(headResp.Header.Get(\"Content-Length\"))'\n")
+
 		return err
 	}
 
@@ -209,7 +213,7 @@ func downloadFile(gameName, url, dest string, current, total int) error {
 
 	go printDownloadPercent(done, path.String(), int64(size))
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) // nogosec
 
 	if err != nil {
 		log.Debugf("Failed at: ''http.Get(url)\n")
@@ -229,5 +233,6 @@ func downloadFile(gameName, url, dest string, current, total int) error {
 
 	elapsed := time.Since(start)
 	log.Infof("Download completed in %s\n", elapsed)
+
 	return nil
 }

@@ -29,3 +29,12 @@ linters:
     - exhaustivestruct
     # https://github.com/golangci/golangci-lint/issues/541
     - interfacer
+    - paralleltest
+    - godox
+    - forbidigo
+    - funlen
+    - gosec
+    - noctx
+    - thelper
+    - wrapcheck
+

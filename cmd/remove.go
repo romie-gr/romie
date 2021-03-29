@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -61,7 +60,7 @@ var removeCmd = &cobra.Command{
 
 			log.Debugf("Folder exist. Removing it now!\n")
 			if err := os.RemoveAll(dirPath); err != nil {
-				fmt.Errorf("Couldn't remove the game '%s': %q\n", game.Name, err)
+				log.Errorf("couldn't remove the game '%s': %q", game.Name, err)
 			}
 			log.Infof("%s has been successfully removed\n", game.Name)
 		}

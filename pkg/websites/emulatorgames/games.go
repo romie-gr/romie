@@ -128,7 +128,6 @@ func getDownloadLink(gameURL string) (downloadLink string, err error) {
 		chromedp.AttributeValue("/html/body/div[3]/div[2]/div[1]/p/span[2]/a", "href", &downloadLink, &ok),
 	)
 
-	//nolint:wrapcheck
 	return strings.TrimSpace(downloadLink), err
 }
 
