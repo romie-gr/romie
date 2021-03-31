@@ -263,7 +263,7 @@ func TestCreateFile(t *testing.T) {
 	}
 }
 
-func skipWindowsAlteredPermissionsDirScenario(t *testing.T, file string, scenarioName string) {
+func skipWindowsAlteredPermissionsDirScenario(t *testing.T, file string, scenarioName string) { // nothelper
 	if strings.Contains(file, filepath.Base(alteredPermissionsDir)) && runtime.GOOS == "windows" {
 		t.Skipf("Skip %q test in windows", scenarioName)
 	}

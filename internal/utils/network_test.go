@@ -12,9 +12,7 @@ import (
 
 func ExampleIsOnline() {
 	google, _ := url.Parse("https://google.com")
-	err := IsOnline(*google)
-
-	if err != nil {
+	if err := IsOnline(*google); err != nil {
 		fmt.Println("Host is not accessible")
 	} else {
 		fmt.Println("Host is accessible")
@@ -117,8 +115,7 @@ func Test_IsOnline(t *testing.T) {
 func Test_IsOnline_MissingHost(t *testing.T) {
 	testURL, _ := url.Parse("https://does-not-exist.romie-gr.romie.com")
 
-	err := IsOnline(*testURL)
-	if (err != nil) != true {
+	if err := IsOnline(*testURL); (err != nil) != true {
 		t.Errorf("IsOnline(%q) error = %v, wantErr %v", testURL.String(), err, true)
 	}
 }

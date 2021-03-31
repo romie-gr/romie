@@ -202,13 +202,13 @@ func TestExtractTo(t *testing.T) {
 	_ = os.RemoveAll(nonWritableDir)
 }
 
-func skipWindowsNonWritableDirScenario(t *testing.T, destination string, scenarioName string) {
+func skipWindowsNonWritableDirScenario(t *testing.T, destination string, scenarioName string) { // nothelper
 	if destination == nonWritableDir && runtime.GOOS == "windows" {
 		t.Skipf("Skip %q test in windows", scenarioName)
 	}
 }
 
-func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
+func followUpAssertAndCleanUp(t *testing.T, extractionPath string) { // nothelper
 	extractedFile := extractionPath + "/archive.txt"
 
 	// Assert file exists
@@ -222,8 +222,7 @@ func followUpAssertAndCleanUp(t *testing.T, extractionPath string) {
 		t.Errorf("Getting file content for file %q failed, error = %v", extractedFile, err)
 	}
 
-	expectation := "Text file!\n"
-	if string(content) != expectation {
+	if expectation := "Text file!\n"; string(content) != expectation {
 		t.Errorf("Fail asserting %q content of file %q, matches %q", content, extractedFile, expectation)
 	}
 
