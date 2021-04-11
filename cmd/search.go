@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
+	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/romie-gr/romie/internal/utils"
 	"github.com/romie-gr/romie/pkg/websites/emulatorgames"
@@ -19,11 +21,15 @@ var searchCmd = &cobra.Command{
 	Short: "Search game ROMs",
 	Run: func(cmd *cobra.Command, args []string) {
 		// EmulatorGames.Net
-		if !utils.FileExists(emulatorgames.DBFile) {
-			log.Fatalf("There is no database for EmulatorGames.Net: %s", emulatorgames.DBFile)
+		dbPath := filepath.Join(Config.Database, emulatorgames.DBFilename)
+
+		if !utils.FileExists(dbPath) {
+			log.Warnf("There is no database for EmulatorGames.Net: %s", dbPath)
+			log.Warnf("Updating database")
+			DownloadDB(emulatorgames.DBFilename, emulatorgames.DBLink)
 		}
 
-		jsonToEmuDB(emulatorgames.DBFile)
+		jsonToEmuDB(dbPath)
 
 		notFound := true
 		for _, rom := range emulatorgames.Roms {
