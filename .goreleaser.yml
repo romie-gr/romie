@@ -7,7 +7,6 @@ builds:
       - linux
       - darwin
       - windows
-      - freebsd
       - openbsd
       - netbsd
       - dragonfly
