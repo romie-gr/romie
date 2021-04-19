@@ -19,7 +19,7 @@ builds:
       - goos: darwin
         goarch: 386, arm
       - goos: windows
-        goarch: arm, arm64
+        goarch: arm, arm64, arm7
       - goos: freebsd
         goarch: arm64
       - goos: netbsd
