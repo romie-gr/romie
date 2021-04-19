@@ -9,9 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const filename string = "database.emulatorgames.json"
-
-var DBFile = getFileDBPath(filename)
+const DBFilename string = "database.emulatorgames.json"
+const DBLink string = "https://raw.githubusercontent.com/romie-gr/romie/master/database.emulatorgames.json"
 
 func getFileDBPath(file string) string {
 	if !utils.FileExists(file) {
@@ -46,7 +45,7 @@ func Parser(console string) {
 		log.Println(v)
 	}
 
-	saveDBFile(DBFile)
+	saveDBFile(getFileDBPath(DBFilename))
 }
 
 func supportedConsole(console string) (err error) {

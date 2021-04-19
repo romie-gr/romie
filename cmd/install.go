@@ -27,21 +27,17 @@ var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install new game ROMs",
 	Run: func(cmd *cobra.Command, args []string) {
-
-		// Get the current filepath where the binary of romie is running
-		// TODO: To read the config file and use the correct PATH
-		path, err := os.Getwd()
-		if err != nil {
-			log.Println(err)
-		}
-
 		// ---- Code Duplication with search.go ---- //
 		// EmulatorGames.Net
-		if !utils.FileExists(emulatorgames.DBFile) {
-			log.Fatalf("There is no database for EmulatorGames.Net: %s", emulatorgames.DBFile)
+		dbPath := filepath.Join(Config.Database, emulatorgames.DBFilename)
+
+		if !utils.FileExists(dbPath) {
+			log.Warnf("There is no database for EmulatorGames.Net: %s", dbPath)
+			log.Warnf("Updating database")
+			DownloadDB(emulatorgames.DBFilename, emulatorgames.DBLink)
 		}
 
-		jsonToEmuDB(emulatorgames.DBFile)
+		jsonToEmuDB(dbPath)
 
 		var foundGames []scraper.Rom
 
@@ -61,18 +57,21 @@ var installCmd = &cobra.Command{
 		log.Infof("Installing %d games ...\n", len(foundGames))
 
 		for i, game := range foundGames {
-			dirPath := filepath.Join(path, game.Name)
-			log.Debugf("Checking if folder exists: %s\n", dirPath)
+			dirPath := filepath.Join(Config.Download, game.Console)
+			gamePath := filepath.Join(dirPath, game.Name)
+			log.Debugf("Checking if folder exists: %s\n", gamePath)
 
-			if utils.FolderExists(dirPath) {
+			if utils.FileExists(gamePath) {
 				log.Errorf("%s is already installed. Skip downloading ...\n", game.Name)
 				continue
 			}
 
-			log.Debugf("Folder doesn't exist. Creating it now!\n")
-			if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
-				log.Errorf("couldn't create %s directory to save the game. %q\n", dirPath, err)
-				continue
+			if utils.FolderExists(dirPath) {
+				log.Debugf("Folder doesn't exist. Creating it now!\n")
+				if err := os.MkdirAll(gamePath, os.ModePerm); err != nil {
+					log.Errorf("couldn't create %s directory to save the game. %q\n", gamePath, err)
+					continue
+				}
 			}
 
 			// If CTRL+C is pressed, handle this with grace
@@ -80,17 +79,17 @@ var installCmd = &cobra.Command{
 			signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 			go func() {
 				<-c
-				cleanup(dirPath)
+				cleanup(gamePath)
 				os.Exit(1)
 			}()
 
-			filePath := filepath.Join(dirPath, filepath.Base(game.DownloadLink))
+			filePath := filepath.Join(gamePath, filepath.Base(game.DownloadLink))
 			log.Debugf("The game will be saved into: \"%s\"", filePath)
 
-			if err := downloadFile(game.Name, game.DownloadLink, dirPath, i+1, len(foundGames)); err != nil {
+			if err := downloadFile(game.Name, game.DownloadLink, gamePath, i+1, len(foundGames)); err != nil {
 				log.Errorf("Failed to download \"%s\" game!\n", game.Name)
 				log.Errorf("Error: %q\n", err)
-				os.RemoveAll(dirPath)
+				os.RemoveAll(gamePath)
 				continue
 			}
 
@@ -98,7 +97,7 @@ var installCmd = &cobra.Command{
 			log.Infof("Extracting the compressed archive ...")
 			if err := archive.Extract(filePath); err != nil {
 				log.Errorf("Failed to extract the compressed archive %s. Error: %q\n", filePath, err)
-				os.RemoveAll(dirPath)
+				os.RemoveAll(gamePath)
 				continue
 			}
 			log.Infof("done!\n\n")
@@ -174,6 +173,13 @@ func downloadFile(name, url, dest string, current, total int) error {
 	log.Printf("[%d/%d] - Downloading: \"%s\"\tfrom\t\"%s\"\n", current, total, name, url)
 
 	var path bytes.Buffer
+
+	// if destination path does not exist, create it
+	if !utils.FolderExists(dest) {
+		if err := os.MkdirAll(dest, os.ModePerm); err != nil {
+			return fmt.Errorf("failed to create directory %v", dest)
+		}
+	}
 
 	path.WriteString(dest)
 	path.WriteString("/")

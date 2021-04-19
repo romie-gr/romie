@@ -16,21 +16,17 @@ var removeCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Remove game ROMs",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Get the current filepath where the binary of romie is running
-		// TODO: To read the config file and use the correct PATH
-		// TODO: Also set this from one place, not multiple
-		path, err := os.Getwd()
-		if err != nil {
-			log.Println(err)
-		}
-
 		// ---- Code Duplication with search.go ---- //
 		// EmulatorGames.Net
-		if !utils.FileExists(emulatorgames.DBFile) {
-			log.Fatalf("There is no database for EmulatorGames.Net: %s", emulatorgames.DBFile)
+		dbPath := filepath.Join(Config.Database, emulatorgames.DBFilename)
+
+		if !utils.FileExists(dbPath) {
+			log.Warnf("There is no database for EmulatorGames.Net: %s", dbPath)
+			log.Warnf("Updating database")
+			DownloadDB(emulatorgames.DBFilename, emulatorgames.DBLink)
 		}
 
-		jsonToEmuDB(emulatorgames.DBFile)
+		jsonToEmuDB(dbPath)
 
 		var foundGames []scraper.Rom
 
@@ -50,7 +46,7 @@ var removeCmd = &cobra.Command{
 		log.Infof("Removing %d games ...\n", len(foundGames))
 
 		for _, game := range foundGames {
-			dirPath := filepath.Join(path, game.Name)
+			dirPath := filepath.Join(Config.Download, game.Console, game.Name)
 			log.Debugf("Checking if folder exists: %s\n", dirPath)
 
 			if !utils.FolderExists(dirPath) {
