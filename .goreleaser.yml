@@ -2,13 +2,17 @@
 env:
   - GO111MODULE=on
 
+before:
+  hooks:
+    - go mod tidy
+
 gomod:
   proxy: true
 
 builds:
   - id: romie
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=1
     goos:
       - linux
       - darwin
@@ -23,6 +27,17 @@ builds:
       - -trimpath
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+    - '^ci:'
+    - Merge pull request
+    - Merge branch
+    - go mod tidy
 
 dockers:
   - goos: linux
