@@ -9,7 +9,7 @@ require (
 	github.com/chromedp/chromedp v0.6.10
 	github.com/client9/misspell v0.3.4
 	github.com/gen2brain/go-unarr v0.1.1
-	github.com/golangci/golangci-lint v1.39.0 // indirect
+	github.com/golangci/golangci-lint v1.39.0
 	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
