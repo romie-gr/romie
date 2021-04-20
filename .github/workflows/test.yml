@@ -1,0 +1,37 @@
+name: test
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags:
+      - 'v*'
+  pull_request:
+
+jobs:
+  test:
+    name: "Run unit tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out source code
+        uses: actions/checkout@v2.3.4
+
+      - name: Install GCC
+        run: |
+          sudo apt-get --allow-releaseinfo-change update
+          sudo apt-get install -y gcc
+
+      - name: Set up Go environment
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: 1.16
+      - run: go version
+
+      - name: Go Test
+        run: go test -failfast -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.txt ./... -run . -timeout 5m
+
+      - name: headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          # this is running only on Ubuntu: /usr/bin/xvfb-run --auto-servernum go test -v -race ./...
+          run: go test -v -race ./...
