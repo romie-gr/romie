@@ -9,12 +9,7 @@ on:
 jobs:
   build:
     name: "Building the Project"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # https://github.com/actions/virtual-environments#available-environments
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout out source code
         uses: actions/checkout@v2.3.4
@@ -46,8 +41,7 @@ jobs:
       - name: Go mod tidy
         uses: Jerome1337/gomod-action@v1.0.0
 
-      - if: startsWith(matrix.os,'ubuntu')
-        name: Set GCC
+      - name: Set GCC
         run: |
           sudo apt-get --allow-releaseinfo-change update
           sudo apt-get install -y gcc
