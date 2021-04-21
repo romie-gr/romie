@@ -4,66 +4,53 @@ on:
   push:
     branches:
       - 'master'
-    tags:
-      - 'v*'
   pull_request:
 
 jobs:
-  Building:
+  build:
+    name: "Building the Project"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-latest, macos-latest]
+        # https://github.com/actions/virtual-environments#available-environments
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout out source code
-        uses: actions/checkout@v2.3.3
+        uses: actions/checkout@v2.3.4
         with:
           fetch-depth: 0
-
-      - if: startsWith(matrix.os,'ubuntu')
-        name: Set up retroarch
-        run: |
-          sudo add-apt-repository -y ppa:libretro/stable && sudo apt-get update
-          sudo apt-get -y install retroarch*
-          retroarch --features
-          ls ~/.config/retroarch
 
       - name: Set up Go environment
         uses: actions/setup-go@v2.1.3
         with:
-          go-version: 1.15
+          go-version: 1.16
+      - run: go version
 
       - name: Cache Go modules
-        uses: actions/cache@v2.1.2
+        uses: actions/cache@v2.1.5
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: make setup
-        run: |
-          make setup
+      - name: Go imports
+        uses: Jerome1337/goimports-action@v1.0.2
 
-      - name: make lint
-        run: |
-          make lint
-
-      - name: make build
-        run: |
-          make build
-
-      - name: make test
-        run: |
-          make test
-
-      - name: Upload binary
-        uses: actions/upload-artifact@v2
+      - name: Go fmt
+        uses: Jerome1337/gofmt-action@v1.0.4
         with:
-          name: romie ${{ matrix.os }}
-          path: ${{ github.workspace }}
+          gofmt-flags: '-l -d'
 
-      - name: make run
+      - name: Go mod tidy
+        uses: Jerome1337/gomod-action@v1.0.0
+
+      - if: startsWith(matrix.os,'ubuntu')
+        name: Set GCC
         run: |
-          make run
+          sudo apt-get --allow-releaseinfo-change update
+          sudo apt-get install -y gcc
+
+      - name: Go build
+        run: go build -o romie

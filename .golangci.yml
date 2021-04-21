@@ -1,40 +1,93 @@
-# This file contains all available configuration options
-# with their default values.
-
-# options for analysis running
-run:
-  tests: true
-
-issues:
-  exclude-rules:
-    - linters:
-        - funlen
-      # Disable 'funlen' linter for test functions.
-      # It's common for table-driven tests to be more than 60 characters long
-      source: "^func Test"
+---
+linters-settings:
+  dupl:
+    threshold: 100
+  funlen:
+    lines: 100
+    statements: 50
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+  gocyclo:
+    min-complexity: 15
+  goimports:
+    local-prefixes: github.com/romie-gr/romie
+  golint:
+    min-confidence: 0.8
+  govet:
+    check-shadowing: true
+  lll:
+    line-length: 140
+  maligned:
+    suggest-new: true
+  misspell:
+    locale: US
 
 linters:
-  enable-all: true
-  disable:
-    - gomnd
-    - gocognit
-    - goerr113
-    - gofumpt
-    - gci
-    - nlreturn
-    - testpackage
-    - gochecknoglobals
-    - gochecknoinits
-    - godot
-    - exhaustivestruct
-    # https://github.com/golangci/golangci-lint/issues/541
-    - interfacer
-    - paralleltest
-    - godox
-    - forbidigo
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+#    - errcheck
+    - errorlint
+    - exportloopref
     - funlen
-    - gosec
-    - noctx
-    - thelper
-    - wrapcheck
+#    - gochecknoglobals
+#    - gochecknoinits
+    - gocognit
+    - goconst
+#    - gocritic
+    - gocyclo
+    - godox
+    - gofmt
+#    - goimports
+#    - golint
+#    - gomnd
+    - goprintffuncname
+#    - gosec
+    - gosimple
+#    - govet
+    - ifshort
+    - ineffassign
+    - lll
+    - makezero
+    - misspell
+    - nakedret
+    - nolintlint
+    - prealloc
+    - revive
+    - rowserrcheck
+    - staticcheck
+    - structcheck
+#    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - wastedassign
+    - whitespace
+#    - wrapcheck
+    - wsl
 
+run:
+  timeout: 5m
+  skip-dirs:
+    - .github
+    - build
+    - web
+
+issues:
+  max-same-issues: 0
+  exclude-use-default: false
