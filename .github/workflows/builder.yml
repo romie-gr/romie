@@ -1,4 +1,4 @@
-name: build
+name: builder
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: "Building the Project"
+  builder:
+    name: Building the Project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out source code
