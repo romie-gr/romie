@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Go imports
-        uses: Jerome1337/goimports-action@v1.0.2
+        uses: Jerome1337/goimports-action@v1.0.3
 
       - name: Go fmt
         uses: Jerome1337/gofmt-action@v1.0.4
