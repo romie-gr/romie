@@ -1,0 +1,50 @@
+name: builder
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  builder:
+    name: Building the Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out source code
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go environment
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: 1.16
+      - run: go version
+
+      - name: Cache Go modules
+        uses: actions/cache@v2.1.5
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Go imports
+        uses: Jerome1337/goimports-action@v1.0.2
+
+      - name: Go fmt
+        uses: Jerome1337/gofmt-action@v1.0.4
+        with:
+          gofmt-flags: '-l -d'
+
+      - name: Go mod tidy
+        uses: Jerome1337/gomod-action@v1.0.0
+
+      - name: Set GCC
+        run: |
+          sudo apt-get --allow-releaseinfo-change update
+          sudo apt-get install -y gcc
+
+      - name: Go build
+        run: go build -o romie
