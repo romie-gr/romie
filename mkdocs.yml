@@ -11,3 +11,5 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Contributing: contributing.md
+  - Installation: install.md
+  - How to use: use.md
