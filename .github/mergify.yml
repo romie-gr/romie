@@ -1,7 +1,6 @@
 pull_request_rules:
   - name: Automatic merge for master when reviewed and CI passes
     conditions:
-      - check-success=validate_goreleaser
       - "#approved-reviews-by>=1"
       - "#changes-requested-reviews-by=0"
       - base=master
@@ -15,7 +14,6 @@ pull_request_rules:
   - name: Automatic merge for Dependabot pull requests (low priority)
     conditions:
       - author~=^dependabot\[bot\]$
-      - check-success=validate_goreleaser
       - label!=Do not merge
     actions:
       review:
