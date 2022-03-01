@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
       - uses: toshimaru/auto-author-assign@v1.4.0
