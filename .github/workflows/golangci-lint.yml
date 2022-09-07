@@ -12,7 +12,7 @@ jobs:
     name: Run golangci-lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.0.2
       - name: Set up LibGL, Mesa & X11 libraries
         run: |
             sudo apt-get --allow-releaseinfo-change update
