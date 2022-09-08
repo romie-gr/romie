@@ -10,11 +10,11 @@ on:
 
 jobs:
   test:
-    name: "Run unit tests"
+    name: "unit tests"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out source code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@master
 
       - name: Install GCC
         run: |
@@ -22,16 +22,10 @@ jobs:
           sudo apt-get install -y gcc
 
       - name: Set up Go environment
-        uses: actions/setup-go@v2.1.5
+        uses: actions/setup-go@v3.2.0
         with:
-          go-version: 1.16
+          go-version-file: './go.mod'
       - run: go version
 
       - name: Go Test
         run: go test -failfast -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.txt ./... -run . -timeout 5m
-
-      - name: headless test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          # this is running only on Ubuntu: /usr/bin/xvfb-run --auto-servernum go test -v -race ./...
-          run: go test -v -race ./...

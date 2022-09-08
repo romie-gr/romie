@@ -1,30 +1,25 @@
 pull_request_rules:
-  - name: Automatic merge for master when reviewed and CI passes
+  - name: automatic merge for master branch when CI passes and 1 reviews
     conditions:
       - "#approved-reviews-by>=1"
-      - "#changes-requested-reviews-by=0"
-      - base=master
-      - label!=Do not merge
+      # checks < ======
+      - check-success=golangci-lint
+      - check-success=Build
+      - check-success=unit tests
+      # checks ====== >
+      - base=main
     actions:
       merge:
-        method: squash
-        strict: smart+fasttrack
-        priority: medium
+        method: merge
 
-  - name: Automatic merge for Dependabot pull requests (low priority)
+  - name: automatic merge for Dependabot pull requests
     conditions:
-      - author~=^dependabot\[bot\]$
-      - label!=Do not merge
+      - author=dependabot[bot]
+            # checks < ======
+      - check-success=golangci-lint
+      - check-success=Build
+      - check-success=unit tests
+      # checks ====== >
     actions:
-      review:
-        type: APPROVE
       merge:
-        method: squash
-        strict: false
-        priority: low
-
-  - name: Remove outdated reviews
-    conditions:
-      - base=master
-    actions:
-      dismiss_reviews: {}
+        method: merge

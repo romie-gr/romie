@@ -7,18 +7,21 @@ on:
       - master
       - main
   pull_request:
+    branches:
+      - "*"
+
 jobs:
   lint:
-    name: Run golangci-lint
+    name: golangci-lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up LibGL, Mesa & X11 libraries
-        run: |
-            sudo apt-get --allow-releaseinfo-change update
-            sudo apt-get install -y gcc
+      - uses: actions/checkout@master
+      - name: Setup Golang
+        uses: actions/setup-go@v3.2.0
+        with:
+          go-version-file: './go.mod'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: 'v1.39.0'

@@ -2,33 +2,30 @@ name: builder
 
 on:
   push:
+    tags:
+      - v*
     branches:
-      - 'master'
+      - master
+      - main
   pull_request:
+    branches:
+      - "*"
 
 jobs:
   builder:
-    name: Building the Project
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out source code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@master
         with:
           fetch-depth: 0
 
       - name: Set up Go environment
-        uses: actions/setup-go@v2.1.5
+        uses: actions/setup-go@v3.2.0
         with:
-          go-version: 1.16
+          go-version-file: './go.mod'
       - run: go version
-
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
 
       - name: Go imports
         uses: Jerome1337/goimports-action@v1.0.3
