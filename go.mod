@@ -3,7 +3,7 @@ module github.com/romie-gr/romie
 go 1.16
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/chromedp/cdproto v0.0.0-20211126220118-81fa0469ad77
 	github.com/chromedp/chromedp v0.7.6
 	github.com/gen2brain/go-unarr v0.1.2
